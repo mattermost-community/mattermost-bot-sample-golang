@@ -1,0 +1,6 @@
+package: github.com/mattermost/mattermost-bot-sample-golang
+import:
+- package: github.com/mattermost/platform
+  version: master
+  subpackages:
+  - model
