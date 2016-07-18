@@ -2,53 +2,45 @@
 
 ## Overview
 
-This sample Bot shows how to use the Mattermost [go-lang driver](https://github.com/mattermost/platform/blob/master/model/client.go) to connect to a Mattermost server to listen and respond to messages.  Documentation for the Go driver can be found [here](https://godoc.org/github.com/mattermost/platform/model#Client)
+This sample Bot shows how to use the Mattermost [Go driver](https://github.com/mattermost/platform/blob/master/model/client.go) interact with a Mattermost server, listen to events and respond to messages.  Documentation for the Go driver can be found [here](https://godoc.org/github.com/mattermost/platform/model#Client)
 
-Highlights of APIs used:
+Highlights of APIs used in this sample:
  - Login to the Mattermost server
  - Create a channel
  - Modify a users attributes 
- - Connect to and listen to WebSocket events for real time responses to messages
+ - Connect and listen to WebSocket events for real time responses to messages
  - Post a message to a channel
 
 ## Setup Server Environment
 
-1.  Install Mattermost server version 3.3+.  This sample is known it work with Mattermost server version 3.3.  Make sure the Mattermost server is running on http://localhost:8065.  If you need help installing Mattermost please refer to our installations guides at [Production Install on Ubuntu 14.04 LTS](http://docs.mattermost.com/install/prod-ubuntu.html)
-
+1.  Install Mattermost server version 3.3+.  This sample is known it work with Mattermost server version 3.3.  Make sure the Mattermost server is running on [http://localhost:8065](http://localhost:8065).  If you need help installing Mattermost please refer to our installations guides [here](http://docs.mattermost.com/install/requirements.html)
 2.  Create the team needed for the bot to run
     - If you have an existing team then skip this step and replace team_name with your existing team.
 ```
 ./bin/platform -create_team -team_name="botsample" -email="admin@example.com" -password="password1" -username="samplebot"
 ```
-
-3.  Create the user account needed for the bot to run
+3.  Create the user account the Bot will run as
 ```
 ./bin/platform -create_user -team_name="botsample" -email="bot@example.com" -password="password1" -username="samplebot"
 ```
-
-
-4.  Setup a 2nd user named bill which we will use to login to Mattermost server.
+4.  Setup a 2nd user which we will use to login and interact with the Bot.
 ```
 ./bin/platform -create_user -team_name="botsample" -email="bill@example.com" -password="password1" -username="bill"
 ```
-
-5.  Optional:  You can give bill `system_admin` permissions
+5.  Optional:  You can give the 2nd user `system_admin` permissions
 ```
 ./bin/platform -assign_role -email="bill@example.com" -role="system_admin"
 ```
+6.  Login as bill to make sure everything is OK with the sample account.  Login into at [http://localhost:8065](http://localhost:8065) with the `bill` account and navigate to the `botsample` team to interact with the bot.
 
-6.  Login as bill to make sure everything is OK with the sample account.  Login into the Mattermost server at http://localhost:8065 with the bill account and navigate to the `botsample` team to interact with the bot.
+## Setup Bot Development Environment
 
-## Setup Bot Environment
-
-1.  Follow the [Developer Machine Setup](http://docs.mattermost.com/developer/developer-setup.html) instructions to setup the bot environment for development.
-
+1.  Follow the [Developer Machine Setup](http://docs.mattermost.com/developer/developer-setup.html) instructions to setup the bot development environment.
 2.  Clone the Github repository to run the sample
 ```
 git clone https://github.com/mattermost/mattermost-bot-sample-golang.git
 cd mattermost-bot-sample-golang
 ```
-
 3.  Start the bot
 ```
 make run
@@ -58,10 +50,8 @@ make run
 
 ## Test the Bot
 
-1.  Login to the Mattermost server as email=`bill@example.com` and password=`password1`
-
+1.  Login to the Mattermost server as `bill@example.com` and `password1`
 2.  Join the `Debugging For Sample Bot` channel
-
 3.  Post a message in the channel like `are you running?` to see if the Bot responds.  You should see a response like `Yes I'm running` if the Bot is running.
 
 
