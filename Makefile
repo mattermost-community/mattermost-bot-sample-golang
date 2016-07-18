@@ -1,13 +1,9 @@
-.PHONY: build package run stop run-client run-server stop-client stop-server restart restart-server restart-client start-docker clean-dist clean nuke check-style check-client-style check-server-style check-unit-tests test dist setup-mac prepare-enteprise run-client-tests setup-run-client-tests cleanup-run-client-tests test-client build-linux build-osx build-windows internal-test-client
+.PHONY: run
 
 # Golang Flags
 GOPATH ?= $(GOPATH:):./vendor
 GOFLAGS ?= $(GOFLAGS:)
 GO=go
-
-all: dist
-
-dist: | test package
 
 .prebuild:
 	@echo Preparation for running go code
