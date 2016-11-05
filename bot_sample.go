@@ -156,7 +156,7 @@ func CreateBotDebuggingChannelIfNeeded() {
 		PrintError(err)
 	} else {
 		channelList := channelsResult.Data.(*model.ChannelList)
-		for _, channel := range channelList.Channels {
+		for _, channel := range *channelList {
 
 			// The logging channel has alredy been created, lets just use it
 			if channel.Name == CHANNEL_LOG_NAME {
@@ -200,7 +200,7 @@ func HandleWebSocketResponse(event *model.WebSocketEvent) {
 
 func HandleMsgFromDebuggingChannel(event *model.WebSocketEvent) {
 	// If this isn't the debugging channel then lets ingore it
-	if event.ChannelId != debuggingChannel.Id {
+	if event.Broadcast.ChannelId != debuggingChannel.Id {
 		return
 	}
 
@@ -209,15 +209,15 @@ func HandleMsgFromDebuggingChannel(event *model.WebSocketEvent) {
 		return
 	}
 
-	// Lets ignore if it's my own events just in case
-	if event.UserId == botUser.Id {
-		return
-	}
-
 	println("responding to debugging channel msg")
 
 	post := model.PostFromJson(strings.NewReader(event.Data["post"].(string)))
 	if post != nil {
+
+		// ignore my events
+		if post.UserId == botUser.Id {
+			return
+		}
 
 		// if you see any word matching 'alive' then respond
 		if matched, _ := regexp.MatchString(`(?:^|\W)alive(?:$|\W)`, post.Message); matched {
