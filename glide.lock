@@ -1,12 +1,12 @@
 hash: 59f8fdb5884e871f2585ef83ec873642ac90ca0bd9b0326e7e6d4643faca6f57
-updated: 2016-07-14T13:58:35.009689283-08:00
+updated: 2016-11-05T10:11:17.087093383-06:00
 imports:
 - name: github.com/alecthomas/log4go
   version: e5dc62318d9bd58682f1dceb53a4b24e8253682f
 - name: github.com/gorilla/websocket
-  version: a836c37014dbbf0d1e871d04531b851fcbdeb22d
+  version: 1f512fc3f05332ba7117626cdfb4e07474e58e60
 - name: github.com/mattermost/platform
-  version: c67729d7b6757758e7f7c9ebf70e85257e32dcd9
+  version: 428444d1852f3949ece0a9f6b73843f46c4a0fb7
   subpackages:
   - model
 - name: github.com/nicksnyder/go-i18n
@@ -17,12 +17,12 @@ imports:
   - i18n/language
   - i18n/translation
 - name: github.com/pborman/uuid
-  version: c55201b036063326c5b1b89ccfe45a184973d073
+  version: a97ce2ca70fa5a848076093f05e639a89ca34d06
 - name: golang.org/x/crypto
-  version: 10c26747e67d76ad4fafe6087c6f4073c3b22942
+  version: 6ab629be5e31660579425a738ba8870beb5b7404
   subpackages:
   - bcrypt
   - blowfish
 - name: gopkg.in/yaml.v2
-  version: a83829b6f1293c91addabc89d0571c246397bbf4
+  version: a5b47d31c556af34a302ce5d659e6fea44d90de0
 testImports: []
