@@ -11,11 +11,13 @@ Highlights of APIs used in this sample:
  - Connect and listen to WebSocket events for real-time responses to messages
  - Post a message to a channel
 
+This sample is intended as an instructive sample and simplified to demonstrate key concepts. This is not intended to be production code. 
+
 ## Setup Server Environment
 
 1 - [Install](http://docs.mattermost.com/install/requirements.html) or [upgrade](https://docs.mattermost.com/administration/upgrade.html) to Mattermost server version 3.5+, and verify that the Mattermost server is running on [http://localhost:8065](http://localhost:8065). 
 
-This Bot Sample was tested with Mattermost server version 3.5.0.
+This Bot Sample was tested with Mattermost server version 3.5.1.
 
 2 - Create a team for the Bot to run. If you have an existing team, you may skip this step and replace `team_name` with your existing team in subsequent steps.
 ```
