@@ -1,5 +1,5 @@
 hash: 59f8fdb5884e871f2585ef83ec873642ac90ca0bd9b0326e7e6d4643faca6f57
-updated: 2017-07-03T14:31:50.238885799-07:00
+updated: 2017-07-11T08:53:56.024731033-06:00
 imports:
 - name: github.com/alecthomas/log4go
   version: 3fbce08846379ec7f4f6bc7fce6dd01ce28fae4c
@@ -7,7 +7,7 @@ imports:
 - name: github.com/gorilla/websocket
   version: 3ab3a8b8831546bd18fd182c20687ca853b2bb13
 - name: github.com/mattermost/platform
-  version: 02335ddad42dcd048f8ef9f371dde90bdaedc1eb
+  version: 83d53ea98cf5486f89bd4280b6b5ef835da4fd22
   subpackages:
   - model
 - name: github.com/nicksnyder/go-i18n
@@ -22,7 +22,7 @@ imports:
 - name: github.com/pelletier/go-toml
   version: 69d355db5304c0f7f809a2edc054553e7142f016
 - name: golang.org/x/crypto
-  version: 69be088f860613049aa58c65154d1b1d32bbdf90
+  version: dd85ac7e6a88fc6ca420478e934de5f1a42dd3c6
   subpackages:
   - bcrypt
   - blowfish
