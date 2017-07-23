@@ -37,7 +37,7 @@ This Bot Sample was tested with Mattermost server version 3.10.0.
 
 ## Setup Bot Development Environment
 
-1 - Follow the [Developer Machine Setup](http://docs.mattermost.com/developer/developer-setup.html) instructions to setup the bot development environment.
+1 - Follow the [Developer Machine Setup](https://docs.mattermost.com/developer/dev-setup.html) instructions to setup the bot development environment.
 
 2 - Clone the GitHub repository to run the sample.
 ```
