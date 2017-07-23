@@ -19,21 +19,25 @@ This Bot Sample was tested with Mattermost server version 3.10.0.
 
 2 - Create a team for the Bot to run. If you have an existing team, you may skip this step and replace `team_name` with your existing team in subsequent steps.
 ```
-./bin/platform -create_team -team_name="botsample" -email="admin@example.com" -password="password1" -username="samplebot"
+./bin/platform team create --name botsample --display_name "Sample Bot playground" --email "admin@example.com"
 ```
 3 - Create the user account the Bot will run as.
 ```
-./bin/platform -create_user -team_name="botsample" -email="bot@example.com" -password="password1" -username="samplebot"
+./bin/platform user create --email="bot@example.com" --password="password1" --username="samplebot"
 ```
 4 - Create a second user, `bill`, which we will use to log in and interact with the Bot.
 ```
-./bin/platform -create_user -team_name="botsample" -email="bill@example.com" -password="password1" -username="bill"
+./bin/platform user create --email="bill@example.com" --password="password1" --username="bill"
 ```
 5 - (Optional) Give `bill` `system_admin` permissions.
 ```
-./bin/platform -assign_role -email="bill@example.com" -role="system_admin"
+./bin/platform roles system_admin bill
 ```
-6 - Log in to [http://localhost:8065](http://localhost:8065) as `bill` and verify the account was created successfully. Then, navigate to the `botsample` team you created in step 2 to interact with the Bot.
+6 - Add users to the team
+```
+./bin/platform team add botsample samplebot bill
+```
+7 - Log in to [http://localhost:8065](http://localhost:8065) as `bill` and verify the account was created successfully. Then, navigate to the `botsample` team you created in step 2 to interact with the Bot.
 
 ## Setup Bot Development Environment
 
