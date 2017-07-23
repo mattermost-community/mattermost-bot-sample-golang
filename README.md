@@ -37,7 +37,8 @@ This Bot Sample was tested with Mattermost server version 3.10.0.
 ```
 ./bin/platform team add botsample samplebot bill
 ```
-7 - Log in to [http://localhost:8065](http://localhost:8065) as `bill` and verify the account was created successfully. Then, navigate to the `botsample` team you created in step 2 to interact with the Bot.
+7 - Log in to [http://localhost:8065](http://localhost:8065) as `samplebot` and verify the e-mail address.
+8 - Log in to [http://localhost:8065](http://localhost:8065) as `bill` and verify the account was created successfully. Then, navigate to the `botsample` team you created in step 2 to interact with the Bot.
 
 ## Setup Bot Development Environment
 
