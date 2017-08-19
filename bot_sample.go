@@ -64,7 +64,7 @@ func main() {
 	SendMsgToDebuggingChannel("_"+SAMPLE_NAME+" has **started** running_", "")
 
 	// Lets start listening to some channels via the websocket!
-	webSocketClient, err := model.NewWebSocketClient("ws://localhost:8065", client.AuthToken)
+	webSocketClient, err := model.NewWebSocketClient4("ws://localhost:8065", client.AuthToken)
 	if err != nil {
 		println("We failed to connect to the web socket")
 		PrintError(err)
