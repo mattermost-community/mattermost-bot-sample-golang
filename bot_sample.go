@@ -8,7 +8,6 @@ import (
 	"os/signal"
 	"regexp"
 	"strings"
-
 	"github.com/mattermost/mattermost-server/model"
 )
 
@@ -39,14 +38,16 @@ func main() {
 
 	SetupGracefulShutdown()
 
-	client = model.NewAPIv4Client("http://localhost:8065")
+	client = model.NewAPIv4Client("http://localhost:80")
 
 	// Lets test to see if the mattermost server is up and running
+	println("Making sure server is running")
 	MakeSureServerIsRunning()
 
 	// lets attempt to login to the Mattermost server as the bot user
 	// This will set the token required for all future calls
 	// You can get this token with client.AuthToken
+	println("Logging in as bot user")
 	LoginAsTheBotUser()
 
 	// If the bot user doesn't have the correct information lets update his profile
@@ -64,7 +65,7 @@ func main() {
 	SendMsgToDebuggingChannel("_"+SAMPLE_NAME+" has **started** running_", "")
 
 	// Lets start listening to some channels via the websocket!
-	webSocketClient, err := model.NewWebSocketClient4("ws://localhost:8065", client.AuthToken)
+	webSocketClient, err := model.NewWebSocketClient4("ws://localhost:80", client.AuthToken)
 	if err != nil {
 		println("We failed to connect to the web socket")
 		PrintError(err)
@@ -217,6 +218,12 @@ func HandleMsgFromDebuggingChannel(event *model.WebSocketEvent) {
 		// if you see any word matching 'hello' then respond
 		if matched, _ := regexp.MatchString(`(?:^|\W)hello(?:$|\W)`, post.Message); matched {
 			SendMsgToDebuggingChannel("Yes I'm running", post.Id)
+			return
+		}
+
+		// if you see any word matching 'ingmar' then respond
+		if matched, _ := regexp.MatchString(`(?:^|\W)ingmar(?:$|\W)`, post.Message); matched {
+			SendMsgToDebuggingChannel("Ingmar? He da boussss", post.Id)
 			return
 		}
 	}
