@@ -4,12 +4,23 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"net/http"
+	"net/url"
 	"os"
 	"os/signal"
 	"regexp"
 	"strings"
 
+	"github.com/mattermost/mattermost-bot-sample-golang/db"
+	"github.com/mattermost/mattermost-bot-sample-golang/schema"
+	"github.com/mattermost/mattermost-bot-sample-golang/types"
+
 	"github.com/mattermost/mattermost-server/v5/model"
+	"github.com/mrjones/oauth"
 )
 
 const (
@@ -35,6 +46,7 @@ var debuggingChannel *model.Channel
 // Documentation for the Go driver can be found
 // at https://godoc.org/github.com/mattermost/platform/model#Client
 func main() {
+	db.Initialize()
 	println(SAMPLE_NAME)
 
 	SetupGracefulShutdown()
@@ -85,6 +97,7 @@ func main() {
 	select {}
 }
 
+// MakeSureServerIsRunning ...
 func MakeSureServerIsRunning() {
 	if props, resp := client.GetOldClientConfig(""); resp.Error != nil {
 		println("There was a problem pinging the Mattermost server.  Are you sure it's running?")
@@ -95,6 +108,7 @@ func MakeSureServerIsRunning() {
 	}
 }
 
+// LoginAsTheBotUser ...
 func LoginAsTheBotUser() {
 	if user, resp := client.Login(USER_EMAIL, USER_PASSWORD); resp.Error != nil {
 		println("There was a problem logging into the Mattermost server.  Are you sure ran the setup steps from the README.md?")
@@ -197,15 +211,29 @@ func HandleMsgFromDebuggingChannel(event *model.WebSocketEvent) {
 		}
 
 		// if you see any word matching 'alive' then respond
-		if matched, _ := regexp.MatchString(`(?:^|\W)alive(?:$|\W)`, post.Message); matched {
-			SendMsgToDebuggingChannel("Yes I'm running", post.Id)
+		if matched, _ := regexp.MatchString(`(?:^|\W)twitter(?:$|\W)`, post.Message); matched {
+			resp, err := http.Get("http://localhost:8080/api/twitter/authurl?channel_id=" + post.ChannelId)
+			if err != nil {
+				return
+			}
+			defer resp.Body.Close()
+			var response types.Response
+
+			body, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return
+			}
+			if err := json.Unmarshal(body, &response); err != nil {
+				return
+			}
+
+			SendMsgToDebuggingChannel(response.Data, post.Id)
 			return
 		}
 
 		// if you see any word matching 'up' then respond
-		if matched, _ := regexp.MatchString(`(?:^|\W)up(?:$|\W)`, post.Message); matched {
-			SendMsgToDebuggingChannel("Yes I'm running", post.Id)
-			return
+		if strings.Split(post.Message, " ")[0] == "/post" {
+			postToTwitter(post)
 		}
 
 		// if you see any word matching 'running' then respond
@@ -222,6 +250,48 @@ func HandleMsgFromDebuggingChannel(event *model.WebSocketEvent) {
 	}
 
 	SendMsgToDebuggingChannel("I did not understand you!", post.Id)
+}
+
+func postToTwitter(post *model.Post) {
+	status := url.PathEscape(strings.Join(strings.Split(post.Message, " ")[1:], " "))
+	if len(status) > 140 {
+		SendMsgToDebuggingChannel("The number of characters should be less than 160", post.Id)
+	}
+	twitterPostURL := "https://api.twitter.com/1.1/statuses/update.json?status=" + status
+	fmt.Println("URL", twitterPostURL)
+	consumer := oauth.NewConsumer(
+		os.Getenv("TWITTER_CONSUMER_KEY"),
+		os.Getenv("TWITTER_CONSUMER_SECRET"),
+		oauth.ServiceProvider{
+			RequestTokenUrl:   "https://api.twitter.com/oauth/request_token",
+			AuthorizeTokenUrl: "https://api.twitter.com/oauth/authorize",
+			AccessTokenUrl:    "https://api.twitter.com/oauth/access_token",
+		},
+	)
+	var credentials schema.Credentials
+	if err := db.FindOne(db.CollectionCredentials, types.JSON{
+		"channel_id": post.ChannelId,
+	}, &credentials); err != nil {
+		return
+	}
+
+	client, err := consumer.MakeHttpClient(&oauth.AccessToken{
+		Token:          credentials.Twitter.AccessToken,
+		Secret:         credentials.Twitter.AccessSecret,
+		AdditionalData: credentials.Twitter.AdditionalData,
+	})
+	if err != nil {
+		return
+	}
+	resp, err := client.Post(twitterPostURL, "application/json", bytes.NewBuffer([]byte{}))
+	if err != nil {
+		return
+	}
+	buf := new(bytes.Buffer)
+	buf.ReadFrom(resp.Body)
+	newStr := buf.String()
+	SendMsgToDebuggingChannel(newStr, post.Id)
+	return
 }
 
 func PrintError(err *model.AppError) {

@@ -32,3 +32,4 @@ Session.vim
 .agignore
 .ctags
 tags
+.env
