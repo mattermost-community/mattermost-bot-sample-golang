@@ -51,7 +51,7 @@ func main() {
 
 	SetupGracefulShutdown()
 
-	client = model.NewAPIv4Client("http://localhost:8065")
+	client = model.NewAPIv4Client("http://192.168.0.100:8065")
 
 	// Lets test to see if the mattermost server is up and running
 	MakeSureServerIsRunning()
@@ -76,7 +76,7 @@ func main() {
 	SendMsgToDebuggingChannel("_"+SAMPLE_NAME+" has **started** running_", "")
 
 	// Lets start listening to some channels via the websocket!
-	webSocketClient, err := model.NewWebSocketClient4("ws://localhost:8065", client.AuthToken)
+	webSocketClient, err := model.NewWebSocketClient4("ws://192.168.0.100:8065", client.AuthToken)
 	if err != nil {
 		println("We failed to connect to the web socket")
 		PrintError(err)
@@ -184,11 +184,31 @@ func SendMsgToDebuggingChannel(msg string, replyToId string) {
 		PrintError(resp.Error)
 	}
 }
+func authenticateWithTwitter(post *model.Post) {
+	resp, err := http.Get("http://192.168.0.100:8080/api/twitter/authurl?channel_id=" + post.ChannelId)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+	var response types.Response
 
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return
+	}
+	if err := json.Unmarshal(body, &response); err != nil {
+		return
+	}
+
+	SendMsgToDebuggingChannel("Login With This Url: "+response.Data, post.Id)
+}
+
+// HandleWebSocketResponse recieves events from mattermost
 func HandleWebSocketResponse(event *model.WebSocketEvent) {
 	HandleMsgFromDebuggingChannel(event)
 }
 
+// HandleMsgFromDebuggingChannel responds to events from mattermost
 func HandleMsgFromDebuggingChannel(event *model.WebSocketEvent) {
 	// If this isn't the debugging channel then lets ingore it
 	if event.Broadcast.ChannelId != debuggingChannel.Id {
@@ -212,28 +232,14 @@ func HandleMsgFromDebuggingChannel(event *model.WebSocketEvent) {
 
 		// if you see any word matching 'alive' then respond
 		if matched, _ := regexp.MatchString(`(?:^|\W)twitter(?:$|\W)`, post.Message); matched {
-			resp, err := http.Get("http://localhost:8080/api/twitter/authurl?channel_id=" + post.ChannelId)
-			if err != nil {
-				return
-			}
-			defer resp.Body.Close()
-			var response types.Response
-
-			body, err := ioutil.ReadAll(resp.Body)
-			if err != nil {
-				return
-			}
-			if err := json.Unmarshal(body, &response); err != nil {
-				return
-			}
-
-			SendMsgToDebuggingChannel(response.Data, post.Id)
+			authenticateWithTwitter(post)
 			return
 		}
 
 		// if you see any word matching 'up' then respond
 		if strings.Split(post.Message, " ")[0] == "/post" {
 			postToTwitter(post)
+			return
 		}
 
 		// if you see any word matching 'running' then respond
@@ -268,6 +274,20 @@ func postToTwitter(post *model.Post) {
 			AccessTokenUrl:    "https://api.twitter.com/oauth/access_token",
 		},
 	)
+
+	n, err := db.Count(db.CollectionCredentials, types.JSON{
+		"channel_id": post.ChannelId,
+	})
+	if err != nil {
+
+		return
+	}
+	fmt.Print("count", n)
+	if n != 1 {
+		authenticateWithTwitter(post)
+		return
+	}
+
 	var credentials schema.Credentials
 	if err := db.FindOne(db.CollectionCredentials, types.JSON{
 		"channel_id": post.ChannelId,
@@ -283,17 +303,30 @@ func postToTwitter(post *model.Post) {
 	if err != nil {
 		return
 	}
+	fmt.Println(credentials.Twitter.AccessToken)
+	fmt.Println(credentials.Twitter.AccessSecret)
+	fmt.Println(credentials.Twitter.AdditionalData)
 	resp, err := client.Post(twitterPostURL, "application/json", bytes.NewBuffer([]byte{}))
 	if err != nil {
+
+		return
+	}
+	fmt.Print("statuscode ", resp.StatusCode)
+	if resp.StatusCode == 401 {
+		authenticateWithTwitter(post)
 		return
 	}
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(resp.Body)
-	newStr := buf.String()
-	SendMsgToDebuggingChannel(newStr, post.Id)
+	if resp.StatusCode == 200 {
+		SendMsgToDebuggingChannel("Succesfully Published to Twitter", post.Id)
+	} else {
+		SendMsgToDebuggingChannel("Failed to Publish to Twitter", post.Id)
+	}
 	return
 }
 
+// PrintError prints error
 func PrintError(err *model.AppError) {
 	println("\tError Details:")
 	println("\t\t" + err.Message)
