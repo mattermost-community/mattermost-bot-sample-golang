@@ -19,6 +19,8 @@ This Bot Sample was tested with Mattermost server version 3.10.0.
 
 On the commands below, if you are running Mattermost server version 5.0 or later, use `./bin/mmctl`. If you are running version 4.10 or earlier, use `./bin/platform`.
 
+Learn more about the `mmctl` CLI tool in the [Mattermost documentation](https://docs.mattermost.com/administration/mmctl-cli-tool.html).
+
 2 - Create a team for the Bot to run. If you have an existing team, you may skip this step and replace `team_name` with your existing team in subsequent steps.
 ```
 ./bin/mmctl team create --name botsample --display_name "Sample Bot playground" --email "admin@example.com"
