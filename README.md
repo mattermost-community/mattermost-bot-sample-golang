@@ -16,7 +16,7 @@ This Bot Sample was tested with Mattermost server version 3.10.0.
 ## Setup Server Environment
 
 ### Via Docker And Docker-Compose
-1 - Ensure [Docker]() and [Docker-Compose]() are installed for your system
+1 - Ensure [Docker](https://www.docker.com/get-started) and [Docker-Compose](https://docs.docker.com/compose/install/) are installed for your system
 
 2 - Run `./add_users.sh`. The login information for the Mattermost client will be printed
 
