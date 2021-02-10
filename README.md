@@ -15,6 +15,23 @@ This Bot Sample was tested with Mattermost server version 3.10.0.
 
 ## Setup Server Environment
 
+### Via Docker And Docker-Compose
+1 - Ensure [Docker]() and [Docker-Compose]() are installed for your system
+
+2 - Run `./add_users.sh`. The login information for the Mattermost client will be printed
+
+3 - Run `docker-compose up -d --build` and the mattermost client will be built and will expose the port `8065` to your system's localhost
+
+4 - Start the Bot.
+```
+make run
+```
+You can verify the Bot is running when 
+  - `Server detected and is running version X.Y.Z` appears on the command line.
+  - `Mattermost Bot Sample has started running` is posted in the `Debugging For Sample Bot` channel.
+
+See "Test the Bot" for testing instructions
+### Via Direct System Install/Setup
 1 - [Install](http://docs.mattermost.com/install/requirements.html) or [upgrade](https://docs.mattermost.com/administration/upgrade.html) to Mattermost server version 3.10+, and verify that the Mattermost server is running on [http://localhost:8065](http://localhost:8065). 
 
 On the commands below, if you are running Mattermost server version 5.0 or later, use `./bin/mmctl`. If you are running version 4.10 or earlier, use `./bin/platform`.
@@ -27,11 +44,11 @@ Learn more about the `mmctl` CLI tool in the [Mattermost documentation](https://
 ```
 3 - Create the user account the Bot will run as.
 ```
-./bin/mmctl user create --email="bot@example.com" --password="password1" --username="samplebot"
+./bin/mmctl user create --email="bot@example.com" --password="Password1!" --username="samplebot"
 ```
 4 - Create a second user, `bill`, which we will use to log in and interact with the Bot.
 ```
-./bin/mmctl user create --email="bill@example.com" --password="password1" --username="bill"
+./bin/mmctl user create --email="bill@example.com" --password="Password1!" --username="bill"
 ```
 5 - (Optional) Give `bill` `system_admin` permissions.
 ```
@@ -66,7 +83,7 @@ You can verify the Bot is running when
 
 ## Test the Bot
 
-1 - Log in to the Mattermost server as `bill@example.com` and `password1.`
+1 - Log in to the Mattermost server as `bill@example.com` and `Password1!`.
 
 2 - Join the `Debugging For Sample Bot` channel.
 
