@@ -72,6 +72,15 @@ func main() {
 
 	webSocketClient.Listen()
 
+	go func() {
+		for {
+			select {
+			case resp := <-webSocketClient.EventChannel:
+				HandleWebSocketResponse(resp)
+			}
+		}
+	}()
+
 	// You can block forever with
 	select {}
 }
