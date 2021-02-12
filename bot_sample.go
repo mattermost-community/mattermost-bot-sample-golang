@@ -73,11 +73,8 @@ func main() {
 	webSocketClient.Listen()
 
 	go func() {
-		for {
-			select {
-			case resp := <-webSocketClient.EventChannel:
-				HandleWebSocketResponse(resp)
-			}
+		for resp := range webSocketClient.EventChannel {
+			HandleWebSocketResponse(resp)
 		}
 	}()
 
