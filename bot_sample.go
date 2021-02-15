@@ -8,9 +8,7 @@ import (
 	"os/signal"
 	"regexp"
 	"strings"
-	"time"
-
-	"github.com/gorilla/websocket"
+	
 	"github.com/mattermost/mattermost-server/v5/model"
 )
 
@@ -74,21 +72,9 @@ func main() {
 
 	webSocketClient.Listen()
 
-	ticker := time.NewTicker(5 * time.Second)
-	defer ticker.Stop()
-
 	go func() {
-		for {
-			select {
-			case resp := <-webSocketClient.EventChannel:
-				HandleWebSocketResponse(resp)
-			case <-ticker.C:
-				webSocketClient.Conn.SetWriteDeadline(time.Now().Add(2 * time.Second))
-				if err := webSocketClient.Conn.WriteMessage(websocket.PingMessage, []byte{}); err != nil {
-					println("send heartbeat error: ", err)
-					return
-				}
-			}
+		for resp := range webSocketClient.EventChannel {
+			HandleWebSocketResponse(resp)
 		}
 	}()
 
