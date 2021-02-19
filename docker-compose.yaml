@@ -5,4 +5,3 @@ services:
     container_name: test_mm
     ports: 
     - "8065:8065"
-    
