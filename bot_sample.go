@@ -16,7 +16,7 @@ const (
 	SAMPLE_NAME = "Mattermost Bot Sample"
 
 	USER_EMAIL    = "bot@example.com"
-	USER_PASSWORD = "password1"
+	USER_PASSWORD = "Password1!"
 	USER_NAME     = "samplebot"
 	USER_FIRST    = "Sample"
 	USER_LAST     = "Bot"

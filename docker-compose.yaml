@@ -1,0 +1,7 @@
+version: "3.9"
+services:
+  test_mm:
+    image: mattermost/mattermost-preview:5.26.0
+    container_name: test_mm
+    ports: 
+    - "8065:8065"
