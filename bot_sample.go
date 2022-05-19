@@ -64,22 +64,19 @@ func main() {
 	SendMsgToDebuggingChannel("_"+SAMPLE_NAME+" has **started** running_", "")
 
 	// Lets start listening to some channels via the websocket!
-	webSocketClient, err := model.NewWebSocketClient4("ws://localhost:8065", client.AuthToken)
-	if err != nil {
-		println("We failed to connect to the web socket")
-		PrintError(err)
-	}
+	for {
+		webSocketClient, err := model.NewWebSocketClient4("ws://localhost:8065", client.AuthToken)
+		if err != nil {
+			println("We failed to connect to the web socket")
+			PrintError(err)
+		}
+		println("Connected to WS")
+		webSocketClient.Listen()
 
-	webSocketClient.Listen()
-
-	go func() {
 		for resp := range webSocketClient.EventChannel {
 			HandleWebSocketResponse(resp)
 		}
-	}()
-
-	// You can block forever with
-	select {}
+	}
 }
 
 func MakeSureServerIsRunning() {
