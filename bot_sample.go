@@ -8,7 +8,7 @@ import (
 	"os/signal"
 	"regexp"
 	"strings"
-	
+
 	"github.com/mattermost/mattermost-server/v5/model"
 )
 
@@ -174,18 +174,18 @@ func HandleWebSocketResponse(event *model.WebSocketEvent) {
 
 func HandleMsgFromDebuggingChannel(event *model.WebSocketEvent) {
 	// If this isn't the debugging channel then lets ingore it
-	if event.Broadcast.ChannelId != debuggingChannel.Id {
+	if event.GetBroadcast().ChannelId != debuggingChannel.Id {
 		return
 	}
 
 	// Lets only reponded to messaged posted events
-	if event.Event != model.WEBSOCKET_EVENT_POSTED {
+	if event.EventType() != model.WEBSOCKET_EVENT_POSTED {
 		return
 	}
 
 	println("responding to debugging channel msg")
 
-	post := model.PostFromJson(strings.NewReader(event.Data["post"].(string)))
+	post := model.PostFromJson(strings.NewReader(event.GetData()["post"].(string)))
 	if post != nil {
 
 		// ignore my events

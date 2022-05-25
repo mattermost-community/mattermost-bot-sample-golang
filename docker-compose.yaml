@@ -1,7 +1,9 @@
 version: "3.9"
 services:
   test_mm:
-    image: mattermost/mattermost-preview:5.26.0
+    image: mattermost/mattermost-preview
     container_name: test_mm
     ports: 
     - "8065:8065"
+    environment:
+      MM_SERVICESETTINGS_ENABLELOCALMODE: "true"
