@@ -1,0 +1,15 @@
+# Server configurations
+server:
+  host: "myhost.com"
+  protocol: "https://"
+  port: 443
+# Bot Details
+bot:
+  name: "Sample Bot Name"
+  email: "bot@email.com"
+  username: "bot-name"
+  user_first: "Bot"
+  user_last: "Name"
+  pass: "password"
+  team_name: "teamname"
+  log_channel: "test-channel"

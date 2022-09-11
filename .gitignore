@@ -32,3 +32,7 @@ Session.vim
 .agignore
 .ctags
 tags
+
+# Config files
+*_config.yml
+.idea/
