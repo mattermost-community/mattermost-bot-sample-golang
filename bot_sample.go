@@ -55,7 +55,7 @@ func main() {
 
 	// Lets start listening to some channels via the websocket!
 	for {
-		webSocketClient, err := model.NewWebSocketClient4("ws://localhost:8065", client.AuthToken)
+		webSocketClient, err := model.NewWebSocketClient4("wss://" + configuration.Server.HOST + ":" + configuration.Server.PORT, client.AuthToken)
 		if err != nil {
 			println("We failed to connect to the web socket")
 			PrintError(err)
@@ -121,6 +121,7 @@ func FindBotTeam(configuration Configuration) {
 }
 
 func CreateBotDebuggingChannelIfNeeded(configuration Configuration) {
+	println("Attempting to open channel " + configuration.Bot.LOG_NAME)
 	if rchannel, resp := client.GetChannelByName(configuration.Bot.LOG_NAME, botTeam.Id, ""); resp.Error != nil {
 		println("We failed to get the channels")
 		PrintError(resp.Error)
