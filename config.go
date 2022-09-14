@@ -19,7 +19,7 @@ type Configuration struct {
         USER_LAST           string `yaml:"user_last"`
         USER_PASSWORD       string `yaml:"user_password"`
         TEAM_NAME           string `yaml:"team_name"`
-        LOG_NAME            string `yaml:"log_channel"`
+        LOG_NAME            string `yaml:"log_name"`
     } `yaml:"bot"`
 }
 
