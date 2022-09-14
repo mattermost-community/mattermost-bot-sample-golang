@@ -53,6 +53,8 @@ func main() {
 	CreateBotDebuggingChannelIfNeeded(configuration)
 	SendMsgToDebuggingChannel("_"+configuration.Bot.SAMPLE_NAME+" has **started** running_", "")
 
+	RegisterHandlers()
+
 	// Lets start listening to some channels via the websocket!
 	for {
 		webSocketClient, err := model.NewWebSocketClient4("wss://" + configuration.Server.HOST + ":" + configuration.Server.PORT, client.AuthToken)
@@ -67,6 +69,12 @@ func main() {
 			HandleWebSocketResponse(resp)
 		}
 	}
+}
+
+// TODO: Is there a way to have each handler register itself??
+func RegisterHandlers() {
+	println("Registering roll handler")
+	RegisterHandler(Handler{"roll", HandleRollMsgFromChannel})
 }
 
 func MakeSureServerIsRunning() {
@@ -177,7 +185,7 @@ func SendMsgToDebuggingChannel(msg string, replyToId string) {
 
 func HandleWebSocketResponse(event *model.WebSocketEvent) {
 	HandleMsgFromDebuggingChannel(event)
-	HandleRollMsgFromChannel(event)
+	HandleMsgFromChannel(event)
 }
 
 func HandleMsgFromDebuggingChannel(event *model.WebSocketEvent) {
