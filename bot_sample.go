@@ -146,6 +146,22 @@ func CreateBotDebuggingChannelIfNeeded(configuration Configuration) {
 	}
 }
 
+func SendMsgToChannel(msg string, channelId string, prePost *model.Post) {
+	post := &model.Post{}
+	post.ChannelId = channelId
+	post.Message = msg
+	if prePost.ReplyCount == 0 {
+		post.RootId = prePost.Id
+	} else {
+		post.RootId = prePost.RootId
+	}
+
+	if _, resp := client.CreatePost(post); resp.Error != nil {
+		println("Failed to send a message to channel " + channelId)
+		PrintError(resp.Error)
+	}
+}
+
 func SendMsgToDebuggingChannel(msg string, replyToId string) {
 	post := &model.Post{}
 	post.ChannelId = debuggingChannel.Id
@@ -161,6 +177,7 @@ func SendMsgToDebuggingChannel(msg string, replyToId string) {
 
 func HandleWebSocketResponse(event *model.WebSocketEvent) {
 	HandleMsgFromDebuggingChannel(event)
+	HandleRollMsgFromChannel(event)
 }
 
 func HandleMsgFromDebuggingChannel(event *model.WebSocketEvent) {
