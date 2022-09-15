@@ -55,10 +55,10 @@ func main() {
     CreateBotDebuggingChannelIfNeeded(configuration)
     SendMsgToDebuggingChannel("_"+configuration.Bot.SAMPLE_NAME+" has **started** running_", "")
 
-    RegisterHandlers()
+    commandType := reflect.TypeOf(&commands.Command{})
+    commandVal := reflect.ValueOf(&commands.Command{})
 
-    // Lets start listening to some channels via the websocket!
-    for {
+    for i := 0; i < commandType.NumMethod(); i++ {
         webSocketClient, err := model.NewWebSocketClient4("wss://" + configuration.Server.HOST + ":" + configuration.Server.PORT, client.AuthToken)
         if err != nil {
             println("We failed to connect to the web socket")
@@ -68,21 +68,9 @@ func main() {
         webSocketClient.Listen()
 
         for resp := range webSocketClient.EventChannel {
-            HandleWebSocketResponse(resp)
+            method := commandType.Method(i)
+            method.Func.Call([]reflect.Value{commandVal, reflect.ValueOf(resp)})
         }
-    }
-}
-
-// TODO: Is there a way to have each handler register itself??
-func RegisterHandlers() {
-    //println("Registering roll handler")
-    //RegisterHandler(Handler{"roll", HandleRollMsgFromChannel})
-    commandType := reflect.TypeOf(&commands.Command{})
-    commandVal := reflect.ValueOf(&commands.Command{})
-
-    for i := 0; i < commandType.NumMethod(); i++ {
-        method := commandType.Method(i)
-        method.Func.Call([]reflect.Value{commandVal, reflect.ValueOf(event)})
     }
 }
 
