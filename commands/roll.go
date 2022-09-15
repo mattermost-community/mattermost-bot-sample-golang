@@ -1,17 +1,18 @@
-package main
+package commands
+
 import (
+	"fmt"
+	"math/rand"
 	"regexp"
 	"strings"
-	"math/rand"
 	"time"
-	"fmt"
 
 	"github.com/mattermost/mattermost-server/v5/model"
 )
 
 const DieSize = 5
 
-func HandleRollMsgFromChannel(event *model.WebSocketEvent) {
+func (c Command) HandleRollMsgFromChannel(event *model.WebSocketEvent) {
 
 	// Let's only respond to messaged posted events
 	if event.EventType() != model.WEBSOCKET_EVENT_POSTED {
@@ -30,11 +31,11 @@ func HandleRollMsgFromChannel(event *model.WebSocketEvent) {
 	// If message doesn't start with ~roll, ignore it
 	if matched, _ := regexp.MatchString(`^~roll(?:$|\W)`, post.Message); matched {
 		rand := rand.New(rand.NewSource(time.Now().UnixNano()))
-		d1 := rand.Intn(DieSize)+1
-		d2 := rand.Intn(DieSize)+1
+		d1 := rand.Intn(DieSize) + 1
+		d2 := rand.Intn(DieSize) + 1
 
 		message := fmt.Sprintf("%s rolled a %d and a %d for a total of %d", senderName, d1, d2, d1+d2)
-		SendMsgToChannel(message,  channelId, post)
+		SendMsgToChannel(message, channelId, post)
 		return
 	}
 }

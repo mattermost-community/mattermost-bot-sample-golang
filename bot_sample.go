@@ -4,14 +4,13 @@
 package main
 
 import (
+	"github.com/mattermost/mattermost-server/v5/model"
 	"os"
 	"os/signal"
+	"reflect"
 	"regexp"
 	"strings"
-
-	"github.com/mattermost/mattermost-server/v5/model"
 )
-
 
 var client *model.Client4
 var webSocketClient *model.WebSocketClient
@@ -23,9 +22,9 @@ var debuggingChannel *model.Channel
 // Documentation for the Go driver can be found
 // at https://godoc.org/github.com/mattermost/platform/model#Client
 func main() {
-    var connection string
-    configuration := GetConfig()
-    connection = configuration.Server.PROTOCOL + configuration.Server.HOST
+	var connection string
+	configuration := GetConfig()
+	connection = configuration.Server.PROTOCOL + configuration.Server.HOST
 
 	SetupGracefulShutdown(configuration)
 
@@ -55,7 +54,7 @@ func main() {
 
 	// Lets start listening to some channels via the websocket!
 	for {
-		webSocketClient, err := model.NewWebSocketClient4("wss://" + configuration.Server.HOST + ":" + configuration.Server.PORT, client.AuthToken)
+		webSocketClient, err := model.NewWebSocketClient4("wss://"+configuration.Server.HOST+":"+configuration.Server.PORT, client.AuthToken)
 		if err != nil {
 			println("We failed to connect to the web socket")
 			PrintError(err)
@@ -81,8 +80,8 @@ func MakeSureServerIsRunning() {
 
 func LoginAsTheBotUser(configuration Configuration) {
 	if user, resp := client.Login(
-        configuration.Bot.USER_EMAIL, 
-        configuration.Bot.USER_PASSWORD); resp.Error != nil {
+		configuration.Bot.USER_EMAIL,
+		configuration.Bot.USER_PASSWORD); resp.Error != nil {
 
 		println("There was a problem logging into the Mattermost server.  Are you sure ran the setup steps from the README.md?")
 		PrintError(resp.Error)
@@ -177,7 +176,13 @@ func SendMsgToDebuggingChannel(msg string, replyToId string) {
 
 func HandleWebSocketResponse(event *model.WebSocketEvent) {
 	HandleMsgFromDebuggingChannel(event)
-	HandleRollMsgFromChannel(event)
+	commandType := reflect.TypeOf(&commands.Command)
+	commandVal := reflect.ValueOf(&commands.Command)
+
+	for i := 0; i < commandType.NumMethod(); i++ {
+		method := commandType.Method(i)
+		method.Func.Call([]reflect.Value{commandVal, reflect.ValueOf(event)})
+	}
 }
 
 func HandleMsgFromDebuggingChannel(event *model.WebSocketEvent) {
