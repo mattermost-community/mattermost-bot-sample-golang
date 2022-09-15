@@ -8,10 +8,8 @@ import (
     "os/signal"
     "regexp"
     "strings"
-    "reflect"
 
     "github.com/mattermost/mattermost-server/v5/model"
-    "github.com/pyrousnet/mattermost-golang-bot/commands"
 )
 
 
@@ -54,24 +52,6 @@ func main() {
     // Lets create a bot channel for logging debug messages into
     CreateBotDebuggingChannelIfNeeded(configuration)
     SendMsgToDebuggingChannel("_"+configuration.Bot.SAMPLE_NAME+" has **started** running_", "")
-
-    commandType := reflect.TypeOf(&commands.Command{})
-    commandVal := reflect.ValueOf(&commands.Command{})
-
-    for i := 0; i < commandType.NumMethod(); i++ {
-        webSocketClient, err := model.NewWebSocketClient4("wss://" + configuration.Server.HOST + ":" + configuration.Server.PORT, client.AuthToken)
-        if err != nil {
-            println("We failed to connect to the web socket")
-            PrintError(err)
-        }
-        println("Connected to WS")
-        webSocketClient.Listen()
-
-        for resp := range webSocketClient.EventChannel {
-            method := commandType.Method(i)
-            method.Func.Call([]reflect.Value{commandVal, reflect.ValueOf(resp)})
-        }
-    }
 }
 
 func MakeSureServerIsRunning() {
@@ -180,9 +160,9 @@ func LoginAsTheBotUser(configuration Configuration) {
         }
     }
 
-    func HandleWebSocketResponse(event *model.WebSocketEvent) {
+    func HandleWebSocketResponse(event *model.WebSocketEvent, configuration Configuration) {
         HandleMsgFromDebuggingChannel(event)
-        HandleMsgFromChannel(event)
+        HandleMsgFromChannel(event, configuration)
     }
 
     func HandleMsgFromDebuggingChannel(event *model.WebSocketEvent) {
