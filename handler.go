@@ -44,8 +44,7 @@ func HandleMsgFromChannel(event *model.WebSocketEvent, configuration Configurati
 
 		for i := 0; i < commandType.NumMethod(); i++ {
 			method := commandType.Method(i)
-			handlerResponse := method.Func.Call([]reflect.Value{commandVal, reflect.ValueOf(event)})[0].Interface().(commands.Command)
-			messageToSend = handlerResponse.Response
+			messageToSend = method.Func.Call([]reflect.Value{commandVal, reflect.ValueOf(event)})[0].Interface().(string)
 		}
 
 		if messageToSend != "" {

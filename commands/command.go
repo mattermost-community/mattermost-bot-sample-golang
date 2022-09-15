@@ -5,6 +5,5 @@ import (
 )
 
 type Command struct {
-	event    *model.WebSocketEvent
-	Response string
+	event *model.WebSocketEvent
 }
