@@ -52,6 +52,20 @@ func main() {
     // Lets create a bot channel for logging debug messages into
     CreateBotDebuggingChannelIfNeeded(configuration)
     SendMsgToDebuggingChannel("_"+configuration.Bot.SAMPLE_NAME+" has **started** running_", "")
+    // Lets start listening to some channels via the websocket!
+    for {
+        webSocketClient, err := model.NewWebSocketClient4("wss://" + configuration.Server.HOST + ":" + configuration.Server.PORT, client.AuthToken)
+        if err != nil {
+            println("We failed to connect to the web socket")
+            PrintError(err)
+        }
+        println("Connected to WS")
+        webSocketClient.Listen()
+
+        for resp := range webSocketClient.EventChannel {
+            HandleWebSocketResponse(resp, configuration)
+        }
+    }
 }
 
 func MakeSureServerIsRunning() {
