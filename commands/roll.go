@@ -1,4 +1,5 @@
-package main
+package commands
+
 import (
 	"regexp"
 	"strings"
@@ -11,7 +12,7 @@ import (
 
 const DieSize = 5
 
-func HandleRollMsgFromChannel(event *model.WebSocketEvent) string {
+func (c Command) HandleRollMsgFromChannel(event *model.WebSocketEvent) string {
 	post := model.PostFromJson(strings.NewReader(event.GetData()["post"].(string)))
 	senderName := event.GetData()["sender_name"]
 	var message string = ""

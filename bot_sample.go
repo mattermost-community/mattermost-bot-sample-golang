@@ -8,8 +8,10 @@ import (
 	"os/signal"
 	"regexp"
 	"strings"
+    "reflect"
 
 	"github.com/mattermost/mattermost-server/v5/model"
+	"github.com/pyrousnet/mattermost-golang-bot/commands"
 )
 
 
@@ -73,8 +75,15 @@ func main() {
 
 // TODO: Is there a way to have each handler register itself??
 func RegisterHandlers() {
-	println("Registering roll handler")
-	RegisterHandler(Handler{"roll", HandleRollMsgFromChannel})
+	//println("Registering roll handler")
+	//RegisterHandler(Handler{"roll", HandleRollMsgFromChannel})
+	commandType := reflect.TypeOf(&commands.Command{})
+	commandVal := reflect.ValueOf(&commands.Command{})
+
+	for i := 0; i < commandType.NumMethod(); i++ {
+		method := commandType.Method(i)
+		method.Func.Call([]reflect.Value{commandVal, reflect.ValueOf(event)})
+	}
 }
 
 func MakeSureServerIsRunning() {
