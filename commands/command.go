@@ -1,6 +1,6 @@
 package commands
 import (
-	"github.com/mattermost/mattermost-server/v5/model"
+    "github.com/mattermost/mattermost-server/v5/model"
 )
 
 type Command struct {
