@@ -145,6 +145,13 @@ func LoginAsTheBotUser(configuration Configuration) {
         }
     }
 
+    func SendCmdToChannel(cmd string, channelId string, prePost *model.Post) {
+        if _, resp := client.ExecuteCommand(channelId, cmd); resp.Error != nil {
+            println("Failed to send a message to channel " + channelId)
+            PrintError(resp.Error)
+        }
+    }
+
     func SendMsgToChannel(msg string, channelId string, prePost *model.Post) {
         post := &model.Post{}
         post.ChannelId = channelId
