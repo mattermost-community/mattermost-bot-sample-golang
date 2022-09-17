@@ -38,7 +38,7 @@ func HandleMsgFromChannel(event *model.WebSocketEvent, configuration Configurati
 
 	if matched, _ := regexp.MatchString(`^!(.*)`, post.Message); matched {
 		var messageToSend string = ""
-		var respType string = "post"
+		var respType  int = commands.Say
 
 		commandType := reflect.TypeOf(&commands.Command{})
 		commandVal := reflect.ValueOf(&commands.Command{})
@@ -46,19 +46,21 @@ func HandleMsgFromChannel(event *model.WebSocketEvent, configuration Configurati
 		for i := 0; i < commandType.NumMethod(); i++ {
 			method := commandType.Method(i)
 			returns := method.Func.Call([]reflect.Value{commandVal, reflect.ValueOf(event)})
-			respType = returns[0].Interface().(string)
+			respType = returns[0].Interface().(int)
 			messageToSend = returns[1].Interface().(string)
 			if messageToSend != "" {
 				break
 			}
 		}
 
-		println("Received type: " + respType)
+		println("Received type: %d", respType)
 		println("Received message: " + messageToSend)
 		if messageToSend != "" {
-			if respType == "post" {
+			if respType == commands.Reply {
 				SendMsgToChannel(messageToSend, channelId, post)
-			} else if respType == "command" {
+			} else if respType == commands.Say {
+                // TODO
+			} else if respType == commands.Emote {
 				SendCmdToChannel(messageToSend, channelId, post)
 			}
 		}

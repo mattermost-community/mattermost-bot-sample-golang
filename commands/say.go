@@ -8,13 +8,15 @@ import (
 	"github.com/mattermost/mattermost-server/v5/model"
 )
 
-func (c Command) HandleSayMsgFromChannel(event *model.WebSocketEvent) string {
+func (c Command) HandleSayMsgFromChannel(event *model.WebSocketEvent) (int, string) {
 	var post string
+    var respType int = Say
+
 	if p, ok := event.GetData()["post"]; ok {
 		post = model.PostFromJson(strings.NewReader(p.(string))).Message
 		//post := model.PostFromJson(strings.NewReader(event.GetData()["post"].(string)))
 	} else {
-		return ""
+		return Err, ""
 	}
 	var message string = ""
 
@@ -24,5 +26,5 @@ func (c Command) HandleSayMsgFromChannel(event *model.WebSocketEvent) string {
 	if len(matched) > 0 {
 		message = fmt.Sprintf("%s", matched[1])
 	}
-	return message
+	return respType, message
 }
