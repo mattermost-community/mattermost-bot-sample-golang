@@ -20,7 +20,7 @@ func (c Command) HandleEmoteMsgFromChannel(event *model.WebSocketEvent) (int, st
 	}
 	var message string = ""
 
-	// If message doesn't start with ~roll, ignore it
+	// If message doesn't start with ~emote, ignore it
     re := regexp.MustCompile(`^!emote (.*)`)
     matched := re.FindStringSubmatch(post)
 	if len(matched) > 0 {

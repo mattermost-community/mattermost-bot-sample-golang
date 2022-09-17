@@ -20,11 +20,11 @@ func (c Command) HandleSayMsgFromChannel(event *model.WebSocketEvent) (int, stri
 	}
 	var message string = ""
 
-	// If message doesn't start with ~roll, ignore it
+	// If message doesn't start with ~say, ignore it
     re := regexp.MustCompile(`^!say (.*)`)
     matched := re.FindStringSubmatch(post)
 	if len(matched) > 0 {
-		message = fmt.Sprintf("%s", matched[1])
+		message = fmt.Sprintf("/echo \"%s\" 1", matched[1])
 	}
 	return respType, message
 }
