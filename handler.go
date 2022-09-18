@@ -1,7 +1,7 @@
 package main
 
 import (
-	"reflect"
+	"fmt"
 	"regexp"
 	"strings"
 
@@ -28,6 +28,11 @@ func HandleMsgFromChannel(event *model.WebSocketEvent, configuration Configurati
 		return
 	}
 
+	// TODO: Move this to settings
+	commandTrigger := "!"
+
+	cmds := commands.NewCommands(commandTrigger)
+
 	channelId := event.GetBroadcast().ChannelId
 	post := model.PostFromJson(strings.NewReader(event.GetData()["post"].(string)))
 
@@ -36,30 +41,17 @@ func HandleMsgFromChannel(event *model.WebSocketEvent, configuration Configurati
 		return
 	}
 
-	if matched, _ := regexp.MatchString(`^!(.*)`, post.Message); matched {
-		var messageToSend string = ""
-		var respType string = "post"
+	pattern := fmt.Sprintf(`^%s(.*)`, commandTrigger)
 
-		commandType := reflect.TypeOf(&commands.Command{})
-		commandVal := reflect.ValueOf(&commands.Command{})
+	if ok, _ := regexp.MatchString(pattern, post.Message); ok {
+		response := cmds.HandleCommandMsgFromWebSocket(event)
 
-		for i := 0; i < commandType.NumMethod(); i++ {
-			method := commandType.Method(i)
-			returns := method.Func.Call([]reflect.Value{commandVal, reflect.ValueOf(event)})
-			respType = returns[0].Interface().(string)
-			messageToSend = returns[1].Interface().(string)
-			if messageToSend != "" {
-				break
-			}
-		}
-
-		println("Received type: " + respType)
-		println("Received message: " + messageToSend)
-		if messageToSend != "" {
-			if respType == "post" {
-				SendMsgToChannel(messageToSend, channelId, post)
-			} else if respType == "command" {
-				SendCmdToChannel(messageToSend, channelId, post)
+		if response.Message != "" {
+			switch response.Type {
+			case "post":
+				SendMsgToChannel(response.Message, channelId, post)
+			case "command":
+				SendCmdToChannel(response.Message, channelId, post)
 			}
 		}
 	}
