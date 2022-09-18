@@ -56,12 +56,14 @@ func HandleMsgFromChannel(event *model.WebSocketEvent, configuration Configurati
 		println("Received type: %d", respType)
 		println("Received message: " + messageToSend)
 		if messageToSend != "" {
-            switch respType {
-                case commands.Reply:
-                    SendMsgToChannel(messageToSend, channelId, post)
-                case commands.Say, commands.Emote:
-                    SendCmdToChannel(messageToSend, channelId, post)
+			switch respType {
+				case commands.Reply:
+					SendMsgToChannel(messageToSend, channelId, post)
+				case commands.Say, commands.Emote:
+						SendCmdToChannel(messageToSend, channelId, post)
+                default:
+                    SendMsgToChannel("Invalid command", channelId, post)
             }
-		}
+        }
 	}
 }
