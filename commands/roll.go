@@ -12,14 +12,14 @@ import (
 
 const DieSize = 5
 
-func (c Command) HandleRollMsgFromChannel(event *model.WebSocketEvent) (string, string) {
+func (c Command) HandleRollMsgFromChannel(event *model.WebSocketEvent) (int, string) {
 	var post string
-	var respType string = "post"
+	var respType int = Say
 	if p, ok := event.GetData()["post"]; ok {
 		post = model.PostFromJson(strings.NewReader(p.(string))).Message
 		//post := model.PostFromJson(strings.NewReader(event.GetData()["post"].(string)))
 	} else {
-		return respType, ""
+		return Err, ""
 	}
 	senderName := event.GetData()["sender_name"]
 	var message string = ""

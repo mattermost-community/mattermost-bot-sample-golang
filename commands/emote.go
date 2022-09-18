@@ -8,9 +8,9 @@ import (
 	"github.com/mattermost/mattermost-server/v5/model"
 )
 
-func (c Command) HandleSayMsgFromChannel(event *model.WebSocketEvent) (int, string) {
+func (c Command) HandleEmoteMsgFromChannel(event *model.WebSocketEvent) (int, string) {
 	var post string
-    var respType int = Say
+    var respType int = Emote
 
 	if p, ok := event.GetData()["post"]; ok {
 		post = model.PostFromJson(strings.NewReader(p.(string))).Message
@@ -20,11 +20,11 @@ func (c Command) HandleSayMsgFromChannel(event *model.WebSocketEvent) (int, stri
 	}
 	var message string = ""
 
-	// If message doesn't start with ~say, ignore it
-    re := regexp.MustCompile(`^!say (.*)`)
+	// If message doesn't start with ~emote, ignore it
+    re := regexp.MustCompile(`^!emote (.*)`)
     matched := re.FindStringSubmatch(post)
 	if len(matched) > 0 {
-		message = fmt.Sprintf("/echo \"%s\" 1", matched[1])
+		message = fmt.Sprintf("/me %s", matched[1])
 	}
 	return respType, message
 }
