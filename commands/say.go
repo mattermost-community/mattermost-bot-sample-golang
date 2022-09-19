@@ -2,13 +2,11 @@ package commands
 
 import (
 	"fmt"
-	"strings"
 )
 
-func (c BotCommand) Say(event BotCommand) (response Response, err error) {
+func (bc BotCommand) Say(event BotCommand) (response Response, err error) {
 	response.Type = "command"
+	response.Message = fmt.Sprintf(`/echo "%s" 1`, bc.body)
 
-	m := strings.TrimLeft(event.body, " ")
-	response.Message = fmt.Sprintf(`/echo "%s" 1`, m)
 	return response, nil
 }
