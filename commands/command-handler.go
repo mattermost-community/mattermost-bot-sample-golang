@@ -65,13 +65,15 @@ func (c *Commands) HandleCommandMsgFromWebSocket(event *model.WebSocketEvent) Re
 		return Response{}
 	}
 
-	methodName := strings.Title(strings.TrimLeft(strings.TrimRight(post, " "), c.CommandTrigger))
+    command := strings.Split(post, " ")[0]
+	methodName := strings.Title(strings.TrimLeft(command, c.CommandTrigger))
 	method, err := c.getMethod(methodName)
 	if err != nil {
 		return Response{}
 	}
 
-	bc.body = strings.TrimLeft(post, " ")
+    var toTrim = fmt.Sprintf("!%s ", strings.TrimLeft(command, c.CommandTrigger))
+	bc.body += strings.TrimLeft(post, toTrim)
 
 	r, err := c.callCommand(method, bc)
 	if err != nil {
