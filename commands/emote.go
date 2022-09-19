@@ -6,7 +6,7 @@ import (
 
 func (bc BotCommand) Emote(event BotCommand) (response Response, err error) {
 	response.Type = "command"
-	response.Message = fmt.Sprintf(`/me "%s"`, bc.body)
+	response.Message = fmt.Sprintf(`/me %s`, event.body)
 
 	return response, nil
 }
