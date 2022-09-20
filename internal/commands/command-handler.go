@@ -76,7 +76,10 @@ func (c *Commands) HandleCommandMsgFromWebSocket(event *model.WebSocketEvent) Re
 	ps := strings.Split(post, " ")
 	methodName := strings.Title(strings.TrimLeft(ps[0], c.CommandTrigger))
 	s := fmt.Sprintf("%v", ps[1])
-	channel := fmt.Sprintf("%v", ps[2])
+	var channel string
+	if len(ps) > 2 {
+		channel = fmt.Sprintf("%v", ps[2])
+	}
 
 	method, err := c.getMethod(methodName)
 	if err != nil {
@@ -91,7 +94,7 @@ func (c *Commands) HandleCommandMsgFromWebSocket(event *model.WebSocketEvent) Re
 	}
 
 	r, err := c.callCommand(method, bc)
-	if s == "in" {
+	if s == "in" && channel != "" {
 		channelObj, _ := bc.mm.GetChannel(channel)
 		r.Channel = channelObj.Id
 	}
