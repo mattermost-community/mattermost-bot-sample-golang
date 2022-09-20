@@ -6,6 +6,8 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/pyrousnet/mattermost-golang-bot/internal/mmclient"
+
 	"github.com/mattermost/mattermost-server/v5/model"
 )
 
@@ -13,6 +15,7 @@ type (
 	Commands struct {
 		availableMethods []Method
 		CommandTrigger   string
+		Mm               *mmclient.MMClient
 	}
 
 	Method struct {
@@ -23,6 +26,7 @@ type (
 	BotCommand struct {
 		body   string
 		sender string
+		mm     *mmclient.MMClient
 	}
 
 	Response struct {
@@ -31,9 +35,10 @@ type (
 	}
 )
 
-func NewCommands(commandTrigger string) *Commands {
+func NewCommands(commandTrigger string, mm *mmclient.MMClient) *Commands {
 	commands := Commands{
 		CommandTrigger: commandTrigger,
+		Mm:             mm,
 	}
 
 	c := BotCommand{}
@@ -51,7 +56,9 @@ func NewCommands(commandTrigger string) *Commands {
 }
 
 func (c *Commands) HandleCommandMsgFromWebSocket(event *model.WebSocketEvent) Response {
-	bc := BotCommand{}
+	bc := BotCommand{
+		mm: c.Mm,
+	}
 
 	if s, ok := event.GetData()["sender_name"]; ok {
 		bc.sender = s.(string)
