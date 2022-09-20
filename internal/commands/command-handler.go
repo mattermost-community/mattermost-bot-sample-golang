@@ -2,6 +2,7 @@ package commands
 
 import (
 	"fmt"
+	"github.com/pyrousnet/mattermost-golang-bot/internal/mmclient"
 	"log"
 	"reflect"
 	"strings"
@@ -21,14 +22,14 @@ type (
 	}
 
 	BotCommand struct {
-		body    string
-		sender  string
-		channel string
+		body   string
+		sender string
 	}
 
 	Response struct {
 		Message string
 		Type    string
+		Channel string
 	}
 )
 
@@ -70,11 +71,6 @@ func (c *Commands) HandleCommandMsgFromWebSocket(event *model.WebSocketEvent) Re
 	methodName := strings.Title(strings.TrimLeft(ps[0], c.CommandTrigger))
 	s := fmt.Sprintf("%c", ps[1])
 	channel := fmt.Sprintf("%c", ps[2])
-	if s == "in" {
-		channelId, _ := main.GetChannel(channel)
-	} else {
-		bc.body = strings.Join(ps[1:], " ")
-	}
 
 	method, err := c.getMethod(methodName)
 	if err != nil {
@@ -82,6 +78,13 @@ func (c *Commands) HandleCommandMsgFromWebSocket(event *model.WebSocketEvent) Re
 	}
 
 	r, err := c.callCommand(method, bc)
+	if s == "in" {
+		client := mmclient.MMClient{}
+		channelObj, _ := client.GetChannel(channel)
+		r.Channel = channelObj.Id
+	} else {
+		bc.body = strings.Join(ps[1:], " ")
+	}
 	if err != nil {
 		log.Printf("Error Executing command: %v", err)
 	}
