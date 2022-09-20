@@ -21,8 +21,9 @@ type (
 	}
 
 	BotCommand struct {
-		body   string
-		sender string
+		body    string
+		sender  string
+		channel string
 	}
 
 	Response struct {
@@ -67,7 +68,13 @@ func (c *Commands) HandleCommandMsgFromWebSocket(event *model.WebSocketEvent) Re
 
 	ps := strings.Split(post, " ")
 	methodName := strings.Title(strings.TrimLeft(ps[0], c.CommandTrigger))
-	bc.body = strings.Join(ps[1:], " ")
+	s := fmt.Sprintf("%c", ps[1])
+	channel := fmt.Sprintf("%c", ps[2])
+	if s == "in" {
+		channelId, _ := main.GetChannel(channel)
+	} else {
+		bc.body = strings.Join(ps[1:], " ")
+	}
 
 	method, err := c.getMethod(methodName)
 	if err != nil {
