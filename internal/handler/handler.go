@@ -35,7 +35,7 @@ func (h *Handler) HandleMsgFromChannel(event *model.WebSocketEvent) {
 	// TODO: Move this to settings
 	commandTrigger := "!"
 
-	cmds := commands.NewCommands(commandTrigger)
+	cmds := commands.NewCommands(commandTrigger, h.mm)
 
 	channelId := event.GetBroadcast().ChannelId
 	post := model.PostFromJson(strings.NewReader(event.GetData()["post"].(string)))
