@@ -5,6 +5,7 @@ go 1.19
 require (
 	github.com/mattermost/mattermost-server/v5 v5.39.3
 	github.com/tkanos/gonfig v0.0.0-20210106201359-53e13348de2f
+	golang.org/x/exp v0.0.0-20220916125017-b168a2c6b86b
 )
 
 require (
@@ -44,7 +45,7 @@ require (
 	go.uber.org/zap v1.17.0 // indirect
 	golang.org/x/crypto v0.0.0-20210616213533-5ff15b29337e // indirect
 	golang.org/x/net v0.0.0-20210614182718-04defd469f4e // indirect
-	golang.org/x/sys v0.0.0-20210616094352-59db8d763f22 // indirect
+	golang.org/x/sys v0.0.0-20220722155257-8c9f86f7a55f // indirect
 	golang.org/x/text v0.3.6 // indirect
 	gopkg.in/ini.v1 v1.62.0 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect

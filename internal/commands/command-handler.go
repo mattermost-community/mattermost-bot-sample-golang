@@ -2,13 +2,13 @@ package commands
 
 import (
 	"fmt"
+	"github.com/pyrousnet/mattermost-golang-bot/internal/mmclient"
 	"log"
 	"reflect"
 	"strings"
 
-	"github.com/pyrousnet/mattermost-golang-bot/internal/mmclient"
-
 	"github.com/mattermost/mattermost-server/v5/model"
+	"golang.org/x/exp/slices"
 )
 
 type (
@@ -32,6 +32,7 @@ type (
 	Response struct {
 		Message string
 		Type    string
+		Channel string
 	}
 )
 
@@ -74,14 +75,29 @@ func (c *Commands) HandleCommandMsgFromWebSocket(event *model.WebSocketEvent) Re
 
 	ps := strings.Split(post, " ")
 	methodName := strings.Title(strings.TrimLeft(ps[0], c.CommandTrigger))
-	bc.body = strings.Join(ps[1:], " ")
+	s := fmt.Sprintf("%v", ps[1])
+	var channel string
+	if len(ps) > 2 {
+		channel = fmt.Sprintf("%v", ps[2])
+	}
 
 	method, err := c.getMethod(methodName)
 	if err != nil {
 		return Response{}
 	}
 
+	if s == "in" {
+		ps = slices.Delete(ps, 0, 3)
+		bc.body = strings.Join(ps[0:], " ")
+	} else {
+		bc.body = strings.Join(ps[1:], " ")
+	}
+
 	r, err := c.callCommand(method, bc)
+	if s == "in" && channel != "" {
+		channelObj, _ := bc.mm.GetChannel(channel)
+		r.Channel = channelObj.Id
+	}
 	if err != nil {
 		log.Printf("Error Executing command: %v", err)
 	}

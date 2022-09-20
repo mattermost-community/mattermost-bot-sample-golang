@@ -49,13 +49,16 @@ func (h *Handler) HandleMsgFromChannel(event *model.WebSocketEvent) {
 
 	if ok, _ := regexp.MatchString(pattern, post.Message); ok {
 		response := cmds.HandleCommandMsgFromWebSocket(event)
+		if "" == response.Channel {
+			response.Channel = channelId
+		}
 
 		if response.Message != "" {
 			switch response.Type {
 			case "post":
-				h.mm.SendMsgToChannel(response.Message, channelId, post)
+				h.mm.SendMsgToChannel(response.Message, response.Channel, post)
 			case "command":
-				h.mm.SendCmdToChannel(response.Message, channelId, post)
+				h.mm.SendCmdToChannel(response.Message, response.Channel, post)
 			}
 		}
 	}
