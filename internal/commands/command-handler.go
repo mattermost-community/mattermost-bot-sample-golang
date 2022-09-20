@@ -7,9 +7,8 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/pyrousnet/mattermost-golang-bot/internal/mmclient"
-
 	"github.com/mattermost/mattermost-server/v5/model"
+	"golang.org/x/exp/slices"
 )
 
 type (
@@ -84,13 +83,17 @@ func (c *Commands) HandleCommandMsgFromWebSocket(event *model.WebSocketEvent) Re
 		return Response{}
 	}
 
-	r, err := c.callCommand(method, bc)
 	if s == "in" {
-		client := mmclient.MMClient{}
-		channelObj, _ := client.GetChannel(channel)
-		r.Channel = channelObj.Id
+		ps = slices.Delete(ps, 0, 3)
+		bc.body = strings.Join(ps[0:], " ")
 	} else {
 		bc.body = strings.Join(ps[1:], " ")
+	}
+
+	r, err := c.callCommand(method, bc)
+	if s == "in" {
+		channelObj, _ := bc.mm.GetChannel(channel)
+		r.Channel = channelObj.Id
 	}
 	if err != nil {
 		log.Printf("Error Executing command: %v", err)

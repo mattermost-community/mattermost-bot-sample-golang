@@ -49,7 +49,6 @@ func (h *Handler) HandleMsgFromChannel(event *model.WebSocketEvent) {
 
 	if ok, _ := regexp.MatchString(pattern, post.Message); ok {
 		response := cmds.HandleCommandMsgFromWebSocket(event)
-		println("here " + response.Channel)
 		if "" == response.Channel {
 			response.Channel = channelId
 		}
