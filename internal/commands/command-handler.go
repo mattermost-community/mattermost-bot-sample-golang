@@ -69,8 +69,8 @@ func (c *Commands) HandleCommandMsgFromWebSocket(event *model.WebSocketEvent) Re
 
 	ps := strings.Split(post, " ")
 	methodName := strings.Title(strings.TrimLeft(ps[0], c.CommandTrigger))
-	s := fmt.Sprintf("%c", ps[1])
-	channel := fmt.Sprintf("%c", ps[2])
+	s := fmt.Sprintf("%v", ps[1])
+	channel := fmt.Sprintf("%v", ps[2])
 
 	method, err := c.getMethod(methodName)
 	if err != nil {

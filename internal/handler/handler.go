@@ -47,10 +47,9 @@ func (h *Handler) HandleMsgFromChannel(event *model.WebSocketEvent) {
 
 	pattern := fmt.Sprintf(`^%s(.*)`, commandTrigger)
 
-	println("here " + post.Message)
 	if ok, _ := regexp.MatchString(pattern, post.Message); ok {
 		response := cmds.HandleCommandMsgFromWebSocket(event)
-		println(response.Channel)
+		println("here " + response.Channel)
 		if "" == response.Channel {
 			response.Channel = channelId
 		}
