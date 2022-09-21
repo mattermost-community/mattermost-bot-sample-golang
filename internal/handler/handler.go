@@ -33,7 +33,7 @@ func (h *Handler) HandleMsgFromChannel(event *model.WebSocketEvent) {
 	}
 
 	// TODO: Move this to settings
-	commandTrigger := "!"
+	commandTrigger := h.mm.Settings.Command_start
 
 	cmds := commands.NewCommands(commandTrigger, h.mm)
 

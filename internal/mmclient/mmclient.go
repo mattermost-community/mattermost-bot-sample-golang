@@ -17,6 +17,7 @@ type MMClient struct {
 	DebuggingChannel *model.Channel
 	Server           Server
 	cfg              *Config
+	Settings	 *Settings
 }
 
 type Server struct {
@@ -31,6 +32,12 @@ func NewMMClient() (client *MMClient, err error) {
 	client = &MMClient{}
 
 	client.cfg, err = GetConfig()
+	if err != nil {
+		return client, err
+	}
+
+	client.Settings = &Settings{}
+	err = GetSettings(client.cfg, client.Settings)
 	if err != nil {
 		return client, err
 	}
