@@ -7,8 +7,8 @@ import (
 
 func (bc BotCommand) Message(event BotCommand) (response Response, err error) {
 	response.Type = "command"
-	sender := strings.TrimLeft(event.sender, "@")
-	response.Message = fmt.Sprintf(`/msg %s %s`, sender, event.body)
+	target := strings.TrimLeft(event.target, "@")
+	response.Message = fmt.Sprintf(`/msg %s %s`, target, event.body)
 
 	return response, nil
 }
