@@ -104,7 +104,7 @@ func (c *Commands) HandleCommandMsgFromWebSocket(event *model.WebSocketEvent) Re
 		} else {
 			method, err = c.getMethod("Message")
 			channelObj, _ = bc.mm.GetChannel(bc.sender)
-			bc.body = channel + " is not a channel name."
+			bc.body = "The channel `" + channel + "` could not be found."
 			r, err = c.callCommand(method, bc)
 		}
 	}
