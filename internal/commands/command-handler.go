@@ -101,6 +101,11 @@ func (c *Commands) HandleCommandMsgFromWebSocket(event *model.WebSocketEvent) Re
 		channelObj, _ := bc.mm.GetChannel(channel)
 		if channelObj != nil {
 			r.Channel = channelObj.Id
+		} else {
+			method, err = c.getMethod("Message")
+			channelObj, _ = bc.mm.GetChannel(bc.sender)
+			bc.body = channel + " is not a channel name."
+			r, err = c.callCommand(method, bc)
 		}
 	}
 	if err != nil {
