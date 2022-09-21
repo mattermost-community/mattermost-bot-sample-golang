@@ -48,6 +48,7 @@ type Settings struct {
 	Command_start	string		`json: "@command_start"`
 	Insults		[]string	`json: "@insults"`
 	Quotes		[]string	`json: "@quotes"`
+	Praises		[]string	`json: "@praises"`
 }
 
 func GetConfig(params ...string) (*Config, error) {
