@@ -75,8 +75,11 @@ func (c *Commands) HandleCommandMsgFromWebSocket(event *model.WebSocketEvent) Re
 
 	ps := strings.Split(post, " ")
 	methodName := strings.Title(strings.TrimLeft(ps[0], c.CommandTrigger))
-	s := fmt.Sprintf("%v", ps[1])
 	var channel string
+	var s string
+	if len(ps) > 1 {
+		s = fmt.Sprintf("%v", ps[1])
+	}
 	if len(ps) > 2 {
 		channel = fmt.Sprintf("%v", ps[2])
 	}
