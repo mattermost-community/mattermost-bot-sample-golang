@@ -99,7 +99,6 @@ func (c *Commands) HandleCommandMsgFromWebSocket(event *model.WebSocketEvent) Re
 	r, err := c.callCommand(method, bc)
 	if s == "in" && channel != "" {
 		channelObj, _ := bc.mm.GetChannel(channel)
-		println(channelObj)
 		if channelObj != nil {
 			r.Channel = channelObj.Id
 		}
