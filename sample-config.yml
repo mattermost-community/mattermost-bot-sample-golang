@@ -13,3 +13,4 @@ bot:
   pass: "password"
   team_name: "teamname"
   log_channel: "test-channel"
+  settings_url: "https://yourdomain.com/config"

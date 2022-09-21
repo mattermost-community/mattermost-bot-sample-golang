@@ -99,7 +99,10 @@ func (c *Commands) HandleCommandMsgFromWebSocket(event *model.WebSocketEvent) Re
 	r, err := c.callCommand(method, bc)
 	if s == "in" && channel != "" {
 		channelObj, _ := bc.mm.GetChannel(channel)
-		r.Channel = channelObj.Id
+		println(channelObj)
+		if channelObj != nil {
+			r.Channel = channelObj.Id
+		}
 	}
 	if err != nil {
 		log.Printf("Error Executing command: %v", err)
