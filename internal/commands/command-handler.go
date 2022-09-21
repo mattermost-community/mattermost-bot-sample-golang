@@ -26,6 +26,7 @@ type (
 	BotCommand struct {
 		body   string
 		sender string
+		target string
 		mm     *mmclient.MMClient
 	}
 
@@ -99,7 +100,15 @@ func (c *Commands) HandleCommandMsgFromWebSocket(event *model.WebSocketEvent) Re
 	r, err := c.callCommand(method, bc)
 	if s == "in" && channel != "" {
 		channelObj, _ := bc.mm.GetChannel(channel)
-		r.Channel = channelObj.Id
+		if channelObj != nil {
+			r.Channel = channelObj.Id
+		} else {
+			method, err = c.getMethod("Message")
+			bc.target = bc.sender
+			channelObj, _ = bc.mm.GetChannel(bc.target)
+			bc.body = "The channel `" + channel + "` could not be found."
+			r, err = c.callCommand(method, bc)
+		}
 	}
 	if err != nil {
 		log.Printf("Error Executing command: %v", err)
