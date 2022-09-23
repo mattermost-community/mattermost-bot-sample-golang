@@ -27,9 +27,8 @@ func NewHandler(mm *mmclient.MMClient) (*Handler, error) {
 }
 
 func (h *Handler) HandleWebSocketResponse(event *model.WebSocketEvent) {
-	// We don't want these fellas blocking the bot from picking up new events
-	go h.HandleMsgFromDebuggingChannel(event)
-	go h.HandleMsgFromChannel(event)
+	h.HandleMsgFromDebuggingChannel(event)
+	h.HandleMsgFromChannel(event)
 }
 
 func (h *Handler) HandleMsgFromChannel(event *model.WebSocketEvent) {

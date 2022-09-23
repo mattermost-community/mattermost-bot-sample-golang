@@ -34,7 +34,8 @@ func main() {
 		ws.Listen()
 
 		for resp := range ws.EventChannel {
-			handler.HandleWebSocketResponse(resp)
+			// We don't want this fella blocking the bot from picking up new events
+			go handler.HandleWebSocketResponse(resp)
 		}
 	}
 }
