@@ -130,7 +130,11 @@ func (c *Commands) callCommand(command Method, param BotCommand) (response Respo
 	var res []reflect.Value
 	res = f.Call(in)
 	rIface := res[0].Interface()
-	return rIface.(Response), nil
+	if res[1].Interface() != nil {
+		err = res[1].Interface().(error)
+	}
+
+	return rIface.(Response), err
 }
 
 func (c *Commands) getMethod(methodName string) (Method, error) {
