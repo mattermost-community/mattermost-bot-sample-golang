@@ -2,10 +2,12 @@ package commands
 
 import (
 	"fmt"
-	"github.com/pyrousnet/mattermost-golang-bot/internal/mmclient"
 	"log"
 	"reflect"
 	"strings"
+
+	"github.com/pyrousnet/mattermost-golang-bot/internal/mmclient"
+	"github.com/pyrousnet/mattermost-golang-bot/internal/settings"
 
 	"github.com/mattermost/mattermost-server/v5/model"
 	"golang.org/x/exp/slices"
@@ -14,8 +16,8 @@ import (
 type (
 	Commands struct {
 		availableMethods []Method
-		CommandTrigger   string
 		Mm               *mmclient.MMClient
+		Settings         *settings.Settings
 	}
 
 	Method struct {
@@ -24,10 +26,11 @@ type (
 	}
 
 	BotCommand struct {
-		body   string
-		sender string
-		target string
-		mm     *mmclient.MMClient
+		body     string
+		sender   string
+		target   string
+		mm       *mmclient.MMClient
+		settings *settings.Settings
 	}
 
 	Response struct {
@@ -37,10 +40,10 @@ type (
 	}
 )
 
-func NewCommands(commandTrigger string, mm *mmclient.MMClient) *Commands {
+func NewCommands(settings *settings.Settings, mm *mmclient.MMClient) *Commands {
 	commands := Commands{
-		CommandTrigger: commandTrigger,
-		Mm:             mm,
+		Settings: settings,
+		Mm:       mm,
 	}
 
 	c := BotCommand{}
@@ -59,7 +62,8 @@ func NewCommands(commandTrigger string, mm *mmclient.MMClient) *Commands {
 
 func (c *Commands) HandleCommandMsgFromWebSocket(event *model.WebSocketEvent) Response {
 	bc := BotCommand{
-		mm: c.Mm,
+		mm:       c.Mm,
+		settings: c.Settings,
 	}
 
 	if s, ok := event.GetData()["sender_name"]; ok {
@@ -75,7 +79,7 @@ func (c *Commands) HandleCommandMsgFromWebSocket(event *model.WebSocketEvent) Re
 	}
 
 	ps := strings.Split(post, " ")
-	methodName := strings.Title(strings.TrimLeft(ps[0], c.CommandTrigger))
+	methodName := strings.Title(strings.TrimLeft(ps[0], c.Settings.GetCommandTrigger()))
 	var channel string
 	var s string
 	if len(ps) > 1 {

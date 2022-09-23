@@ -16,8 +16,8 @@ type MMClient struct {
 	BotTeam          *model.Team
 	DebuggingChannel *model.Channel
 	Server           Server
+	SettingsUrl      string
 	cfg              *Config
-	Settings	 *Settings
 }
 
 type Server struct {
@@ -36,13 +36,8 @@ func NewMMClient() (client *MMClient, err error) {
 		return client, err
 	}
 
-	client.Settings = &Settings{}
-	err = GetSettings(client.cfg, client.Settings)
-	if err != nil {
-		return client, err
-	}
-
 	client.Server = client.cfg.Server
+	client.SettingsUrl = client.cfg.Bot.SETTINGS_URL
 	conn := client.Server.PROTOCOL + client.Server.HOST
 	client.Client = model.NewAPIv4Client(conn)
 

@@ -3,11 +3,12 @@ package commands
 import (
 	"fmt"
 	"math/rand"
-	"time"
 	"strings"
+	"time"
 )
 
 func (bc BotCommand) Praise(event BotCommand) (response Response, err error) {
+	praises := event.settings.GetPraises()
 	response.Type = "post"
 	var index int
 
@@ -15,12 +16,12 @@ func (bc BotCommand) Praise(event BotCommand) (response Response, err error) {
 		response.Type = "post"
 		response.Message = "You must tell me who to insult"
 	}
-	arraySize := len(event.mm.Settings.Praises)
+	arraySize := len(praises)
 
 	rand := rand.New(rand.NewSource(time.Now().UnixNano()))
 	index = rand.Intn(arraySize)
-	response.Message = fmt.Sprintf(`%s`, event.mm.Settings.Praises[index])
-	response.Message = strings.Replace(response.Message, "{nick}", event.mm.Settings.Nick, -1)
+	response.Message = fmt.Sprintf(`%s`, praises[index])
+	response.Message = strings.Replace(response.Message, "{nick}", event.mm.BotUser.Username, -1)
 	response.Message = strings.Replace(response.Message, "{0}", event.body, -1)
 
 	return response, nil

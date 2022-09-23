@@ -3,10 +3,6 @@ package mmclient
 import (
 	"fmt"
 	"os"
-	"net/http"
-	"time"
-	"encoding/json"
-	"io/ioutil"
 
 	"github.com/tkanos/gonfig"
 )
@@ -30,27 +26,6 @@ type Config struct {
 	} `yaml:"bot"`
 }
 
-type ChannelList struct {
-	id	int
-	name	string
-}
-
-type Settings struct {
-	Server		string		`json: "@server"`
-	Password	string		`json: "@password"`
-	Port		int		`json: "@port"`
-	Secure		int		`json: "@secure"`
-	server_validate string		`json: "@server_validate"`
-	User		string		`json: "@user"`
-	Nick		string		`json: "@nick"`
-	Channels	[]ChannelList	`json: "@channels"`
-	Admins		[]string	`json: "@admins"`
-	Command_start	string		`json: "@command_start"`
-	Insults		[]string	`json: "@insults"`
-	Quotes		[]string	`json: "@quotes"`
-	Praises		[]string	`json: "@praises"`
-}
-
 func GetConfig(params ...string) (*Config, error) {
 	cfg := Config{}
 
@@ -67,24 +42,4 @@ func GetConfig(params ...string) (*Config, error) {
 	err := gonfig.GetConf(fileName, &cfg)
 
 	return &cfg, err
-}
-
-func GetSettings(cfg *Config, target *Settings) (error) {
-	httpClient := &http.Client{Timeout: 10 * time.Second}
-
-	r, err := httpClient.Get(cfg.Bot.SETTINGS_URL)
-
-	if err != nil {
-		return err
-	}
-	defer r.Body.Close()
-
-	data, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		return err
-	}
-
-	err = json.Unmarshal(data, &target)
-
-	return err
 }

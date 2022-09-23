@@ -17,7 +17,10 @@ func main() {
 		log.Fatalln(err.Error())
 	}
 
-	handler := handler.NewHandler(mm)
+	handler, err := handler.NewHandler(mm)
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
 
 	// Lets start listening to some channels via the websocket!
 	for {
@@ -31,7 +34,8 @@ func main() {
 		ws.Listen()
 
 		for resp := range ws.EventChannel {
-			handler.HandleWebSocketResponse(resp)
+			// We don't want this fella blocking the bot from picking up new events
+			go handler.HandleWebSocketResponse(resp)
 		}
 	}
 }
