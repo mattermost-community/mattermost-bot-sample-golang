@@ -9,10 +9,6 @@ import (
 	"time"
 )
 
-type Reaction struct {
-	Url         string `json:"url"`
-	Description string `json:"description"`
-}
 type (
 	Settings struct {
 		mu          sync.RWMutex
@@ -26,6 +22,11 @@ type (
 		Quotes         []string            `json:"quotes"`
 		Praises        []string            `json:"praises"`
 		Reactions      map[string]Reaction `json:"reactions"`
+	}
+
+	Reaction struct {
+		Url         string `json:"url"`
+		Description string `json:"description"`
 	}
 )
 
