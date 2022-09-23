@@ -23,6 +23,11 @@ func (bc BotCommand) Help(event BotCommand) (response Response, err error) {
 
 		target := strings.TrimLeft(event.target, "@")
 		response.Message = fmt.Sprintf(`/msg %s %s`, target, responseMessage)
+	case "roll":
+		event.target = event.sender
+		target := strings.TrimLeft(event.target, "@")
+		responseMessage := "Rolls a single 6 sided die for a random response to your query.\n e.g. !roll should I take a break?"
+		response.Message = fmt.Sprintf(`/msg %s %s`, target, responseMessage)
 	}
 
 	return response, nil
