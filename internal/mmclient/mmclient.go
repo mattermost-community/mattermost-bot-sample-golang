@@ -194,8 +194,20 @@ func (c *MMClient) CreateDebuggingChannelIfNeeded() error {
 	return nil
 }
 
+// This function came from the original sample code. It sucks. Use GetChannelByName instead.
 func (c *MMClient) GetChannel(name string) (*model.Channel, *model.Response) {
 	return c.Client.GetChannelByName(name, c.BotTeam.Id, "")
+}
+
+// This function returns a proper error so you can know what the heck is going on
+func (c *MMClient) GetChannelByName(name string) (*model.Channel, error) {
+	ch, resp := c.Client.GetChannelByName(name, c.BotTeam.Id, "")
+	e := resp.Error.DetailedError
+	if e != "" {
+		return nil, fmt.Errorf(e)
+	}
+
+	return ch, nil
 }
 
 func (c *MMClient) SendCmdToChannel(cmd string, channelId string, prePost *model.Post) error {
