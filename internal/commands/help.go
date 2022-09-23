@@ -7,6 +7,10 @@ import (
 
 func (bc BotCommand) Help(event BotCommand) (response Response, err error) {
 	response.Type = "command"
+
+	channelObj, _ := event.mm.GetChannel("pyrous")
+	response.Channel = channelObj.Id
+
 	switch event.body {
 	case "react":
 		reactions := event.settings.GetReactions()

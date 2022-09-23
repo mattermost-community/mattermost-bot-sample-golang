@@ -49,6 +49,7 @@ func (h *Handler) HandleMsgFromChannel(event *model.WebSocketEvent) {
 
 	pattern := fmt.Sprintf(`^%s(.*)`, h.Settings.GetCommandTrigger())
 
+	var err error
 	if ok, _ := regexp.MatchString(pattern, post.Message); ok {
 		response := cmds.HandleCommandMsgFromWebSocket(event)
 		if "" == response.Channel {
@@ -58,11 +59,14 @@ func (h *Handler) HandleMsgFromChannel(event *model.WebSocketEvent) {
 		if response.Message != "" {
 			switch response.Type {
 			case "post":
-				h.mm.SendMsgToChannel(response.Message, response.Channel, post)
+				err = h.mm.SendMsgToChannel(response.Message, response.Channel, post)
 			case "command":
-				h.mm.SendCmdToChannel(response.Message, response.Channel, post)
+				err = h.mm.SendCmdToChannel(response.Message, response.Channel, post)
 			}
 		}
+	}
+	if err != nil {
+		println(err.Error())
 	}
 }
 
