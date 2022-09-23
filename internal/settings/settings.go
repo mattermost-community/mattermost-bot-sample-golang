@@ -16,10 +16,10 @@ type (
 	}
 
 	CommandSettings struct {
-		CommandTrigger string   `json:"@command_start"`
-		Insults        []string `json:"@insults"`
-		Quotes         []string `json:"@quotes"`
-		Praises        []string `json:"@praises"`
+		CommandTrigger string   `json:"command_start"`
+		Insults        []string `json:"insults"`
+		Quotes         []string `json:"quotes"`
+		Praises        []string `json:"praises"`
 	}
 )
 
