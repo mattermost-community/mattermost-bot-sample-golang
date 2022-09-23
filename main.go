@@ -17,7 +17,10 @@ func main() {
 		log.Fatalln(err.Error())
 	}
 
-	handler := handler.NewHandler(mm)
+	handler, err := handler.NewHandler(mm)
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
 
 	// Lets start listening to some channels via the websocket!
 	for {

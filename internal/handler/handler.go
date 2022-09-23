@@ -7,18 +7,23 @@ import (
 
 	"github.com/pyrousnet/mattermost-golang-bot/internal/commands"
 	"github.com/pyrousnet/mattermost-golang-bot/internal/mmclient"
+	"github.com/pyrousnet/mattermost-golang-bot/internal/settings"
 
 	"github.com/mattermost/mattermost-server/v5/model"
 )
 
 type Handler struct {
-	mm *mmclient.MMClient
+	Settings *settings.Settings
+	mm       *mmclient.MMClient
 }
 
-func NewHandler(mm *mmclient.MMClient) *Handler {
+func NewHandler(mm *mmclient.MMClient) (*Handler, error) {
+	settings, err := settings.NewSettings(mm.SettingsUrl)
+
 	return &Handler{
-		mm: mm,
-	}
+		Settings: settings,
+		mm:       mm,
+	}, err
 }
 
 func (h *Handler) HandleWebSocketResponse(event *model.WebSocketEvent) {
@@ -32,10 +37,7 @@ func (h *Handler) HandleMsgFromChannel(event *model.WebSocketEvent) {
 		return
 	}
 
-	// TODO: Move this to settings
-	commandTrigger := h.mm.Settings.Command_start
-
-	cmds := commands.NewCommands(commandTrigger, h.mm)
+	cmds := commands.NewCommands(h.Settings, h.mm)
 
 	channelId := event.GetBroadcast().ChannelId
 	post := model.PostFromJson(strings.NewReader(event.GetData()["post"].(string)))
@@ -45,7 +47,7 @@ func (h *Handler) HandleMsgFromChannel(event *model.WebSocketEvent) {
 		return
 	}
 
-	pattern := fmt.Sprintf(`^%s(.*)`, commandTrigger)
+	pattern := fmt.Sprintf(`^%s(.*)`, h.Settings.GetCommandTrigger())
 
 	if ok, _ := regexp.MatchString(pattern, post.Message); ok {
 		response := cmds.HandleCommandMsgFromWebSocket(event)
