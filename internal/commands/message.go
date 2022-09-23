@@ -8,7 +8,7 @@ import (
 func (bc BotCommand) Message(event BotCommand) (response Response, err error) {
 	response.Type = "command"
 
-	channelObj, _ := event.mm.GetChannel("town-square")
+	channelObj, _ := event.mm.GetChannel(event.mm.DebuggingChannel.Name)
 	response.Channel = channelObj.Id
 
 	target := strings.TrimLeft(event.target, "@")
