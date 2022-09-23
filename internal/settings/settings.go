@@ -9,6 +9,10 @@ import (
 	"time"
 )
 
+type Reaction struct {
+	Url         string `json:"url"`
+	Description string `json:"description"`
+}
 type (
 	Settings struct {
 		mu          sync.RWMutex
@@ -17,11 +21,11 @@ type (
 	}
 
 	CommandSettings struct {
-		CommandTrigger string            `json:"command_start"`
-		Insults        []string          `json:"insults"`
-		Quotes         []string          `json:"quotes"`
-		Praises        []string          `json:"praises"`
-		Reactions      map[string]string `json:"reactions"`
+		CommandTrigger string              `json:"command_start"`
+		Insults        []string            `json:"insults"`
+		Quotes         []string            `json:"quotes"`
+		Praises        []string            `json:"praises"`
+		Reactions      map[string]Reaction `json:"reactions"`
 	}
 )
 
@@ -102,7 +106,7 @@ func (c *Settings) GetPraises() []string {
 	return praises
 }
 
-func (c *Settings) GetReactions() map[string]string {
+func (c *Settings) GetReactions() map[string]Reaction {
 	c.mu.RLock()
 	reactions := c.settings.Reactions
 	c.mu.RUnlock()
