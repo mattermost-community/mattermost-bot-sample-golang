@@ -2,6 +2,7 @@ package handler
 
 import (
 	"fmt"
+	"log"
 	"regexp"
 	"strings"
 
@@ -49,8 +50,7 @@ func (h *Handler) HandleMsgFromChannel(event *model.WebSocketEvent) {
 
 	pattern := fmt.Sprintf(`^%s(.*)`, h.Settings.GetCommandTrigger())
 
-	var err error
-	if ok, _ := regexp.MatchString(pattern, post.Message); ok {
+	if ok, err := regexp.MatchString(pattern, post.Message); ok {
 		response := cmds.HandleCommandMsgFromWebSocket(event)
 		if "" == response.Channel {
 			response.Channel = channelId
@@ -64,9 +64,10 @@ func (h *Handler) HandleMsgFromChannel(event *model.WebSocketEvent) {
 				err = h.mm.SendCmdToChannel(response.Message, response.Channel, post)
 			}
 		}
-	}
-	if err != nil {
-		println(err.Error())
+
+		if err != nil {
+			log.Println(err)
+		}
 	}
 }
 
