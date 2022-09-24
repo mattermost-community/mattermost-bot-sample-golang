@@ -60,6 +60,11 @@ func (h *Handler) HandleMsgFromChannel(event *model.WebSocketEvent) {
 			response.Channel = channelId
 		}
 
+		dmchannel, _ := h.mm.Client.CreateDirectChannel(post.UserId, h.mm.BotUser.Id)
+		if response.Channel == dmchannel.Id {
+			response.Type = "dm"
+		}
+
 		if response.Message != "" {
 			switch response.Type {
 			case "post":
