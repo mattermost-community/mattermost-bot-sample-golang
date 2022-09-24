@@ -78,7 +78,9 @@ func (h *Handler) HandleMsgFromChannel(event *model.WebSocketEvent) {
 				post.Message = response.Message
 
 				_, e := h.mm.Client.CreatePost(post)
-				err = fmt.Errorf(e.Error.DetailedError)
+				if e.Error != nil {
+					err = fmt.Errorf("%+v\n", e.Error)
+				}
 			}
 		}
 
