@@ -6,6 +6,13 @@ import (
 	"time"
 )
 
+func (h BotCommandHelp) Roll(request BotCommand) (response HelpResponse) {
+	return HelpResponse{
+		Help:        "Rolls two 6 sided dice for a random response to your query.\n e.g. !roll should I take a break?",
+		Description: "Roll some dice!",
+	}
+}
+
 func (bc BotCommand) Roll(event BotCommand) (response Response, err error) {
 	dieSize := 5
 
