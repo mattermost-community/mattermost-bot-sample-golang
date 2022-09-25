@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"sync"
 	"time"
 )
@@ -16,10 +17,16 @@ type (
 	}
 
 	CommandSettings struct {
-		CommandTrigger string   `json:"command_start"`
-		Insults        []string `json:"insults"`
-		Quotes         []string `json:"quotes"`
-		Praises        []string `json:"praises"`
+		CommandTrigger string              `json:"command_start"`
+		Insults        []string            `json:"insults"`
+		Quotes         []string            `json:"quotes"`
+		Praises        []string            `json:"praises"`
+		Reactions      map[string]Reaction `json:"reactions"`
+	}
+
+	Reaction struct {
+		Url         string `json:"url"`
+		Description string `json:"description"`
 	}
 )
 
@@ -55,6 +62,18 @@ func (c *Settings) LoadSettings() error {
 
 	c.mu.Lock()
 	c.settings = s
+
+	// this is temporary until we get these pulling from the server
+	if len(c.settings.Reactions) == 0 {
+		jf, err := os.Open("./reactions.json")
+		if err != nil {
+			return err
+		}
+		defer jf.Close()
+		b, _ := ioutil.ReadAll(jf)
+
+		json.Unmarshal(b, &c.settings.Reactions)
+	}
 	c.mu.Unlock()
 
 	return nil
@@ -86,4 +105,11 @@ func (c *Settings) GetPraises() []string {
 	praises := c.settings.Praises
 	c.mu.RUnlock()
 	return praises
+}
+
+func (c *Settings) GetReactions() map[string]Reaction {
+	c.mu.RLock()
+	reactions := c.settings.Reactions
+	c.mu.RUnlock()
+	return reactions
 }

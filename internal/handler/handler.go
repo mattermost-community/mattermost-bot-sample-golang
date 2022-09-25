@@ -2,6 +2,7 @@ package handler
 
 import (
 	"fmt"
+	"log"
 	"regexp"
 	"strings"
 
@@ -27,8 +28,11 @@ func NewHandler(mm *mmclient.MMClient) (*Handler, error) {
 }
 
 func (h *Handler) HandleWebSocketResponse(event *model.WebSocketEvent) {
-	h.HandleMsgFromDebuggingChannel(event)
-	h.HandleMsgFromChannel(event)
+	if event.GetBroadcast().ChannelId == h.mm.DebuggingChannel.Id {
+		h.HandleMsgFromDebuggingChannel(event)
+	} else {
+		h.HandleMsgFromChannel(event)
+	}
 }
 
 func (h *Handler) HandleMsgFromChannel(event *model.WebSocketEvent) {
@@ -49,29 +53,48 @@ func (h *Handler) HandleMsgFromChannel(event *model.WebSocketEvent) {
 
 	pattern := fmt.Sprintf(`^%s(.*)`, h.Settings.GetCommandTrigger())
 
-	if ok, _ := regexp.MatchString(pattern, post.Message); ok {
-		response := cmds.HandleCommandMsgFromWebSocket(event)
-		if "" == response.Channel {
-			response.Channel = channelId
-		}
-
-		if response.Message != "" {
-			switch response.Type {
-			case "post":
-				h.mm.SendMsgToChannel(response.Message, response.Channel, post)
-			case "command":
-				h.mm.SendCmdToChannel(response.Message, response.Channel, post)
+	ok, err := regexp.MatchString(pattern, post.Message)
+	if ok {
+		response, err := cmds.HandleCommandMsgFromWebSocket(event)
+		if err == nil {
+			if "" == response.Channel {
+				response.Channel = channelId
 			}
+
+			dmchannel, _ := h.mm.Client.CreateDirectChannel(post.UserId, h.mm.BotUser.Id)
+			if response.Channel == dmchannel.Id {
+				response.Type = "dm"
+			}
+
+			if response.Message != "" {
+				switch response.Type {
+				case "post":
+					err = h.mm.SendMsgToChannel(response.Message, response.Channel, post)
+				case "command":
+					err = h.mm.SendCmdToChannel(response.Message, response.Channel, post)
+				case "dm":
+					c, _ := h.mm.Client.CreateDirectChannel(post.UserId, h.mm.BotUser.Id)
+					post := &model.Post{}
+					post.ChannelId = c.Id
+					post.Message = response.Message
+
+					_, e := h.mm.Client.CreatePost(post)
+					if e.Error != nil {
+						err = fmt.Errorf("%+v\n", e.Error)
+					}
+				}
+			}
+		} else {
+			log.Println(err)
 		}
+	}
+
+	if err != nil {
+		log.Println(err)
 	}
 }
 
 func (h *Handler) HandleMsgFromDebuggingChannel(event *model.WebSocketEvent) {
-	// If this isn't the debugging channel then lets ingore it
-	if event.GetBroadcast().ChannelId != h.mm.DebuggingChannel.Id {
-		return
-	}
-
 	// Lets only reponded to messaged posted events
 	if event.EventType() != model.WEBSOCKET_EVENT_POSTED {
 		return

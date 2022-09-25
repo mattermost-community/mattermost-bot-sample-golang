@@ -1,0 +1,34 @@
+{
+  "foot": {
+    "url": "https://c.tenor.com/zbCrXJr0-y4AAAAd/richard-stallman-foot.gif",
+    "description": "Richard Stallman eats something from his foot."
+  },
+  "shocked": {
+    "url":"https://c.tenor.com/teFSAfy_xVQAAAAC/michael-scott-steve-carell.gif",
+    "description": "Michael Scott reacts with surprise."
+  },
+  "party": {
+    "url":"https://media.giphy.com/media/l0amJzVHIAfl7jMDos/giphy.gif",
+    "description": "Michael Scott party dances."
+  },
+  "sass": {
+    "url": "https://media.giphy.com/media/bm3ud11tTzKXGkTtzE/giphy.gif",
+    "description": "Ron Swanson scowls in anger."
+  },
+  "think": {
+    "url": "https://media.giphy.com/media/3wg0fn7mKT3fFcO27g/giphy.gif",
+    "description": "Andy giving a thinking gesture"
+  },
+  "bingo": {
+    "url": "https://i.pinimg.com/originals/97/bc/4a/97bc4a7e308fece778d14cb0d524bd24.gif",
+    "description": "Nazi soldier saying 'That's a bingo.'"
+  },
+  "giddy": {
+    "url": "https://c.tenor.com/Nb0poGEVgLQAAAAC/giddy-waltz.gif",
+    "description": "Nazi soldier giddy with happiness."
+  },
+  "happy birthday": {
+    "url": "https://c.tenor.com/zXhHhIN1KF8AAAAd/hey-you-happy-birthday.gif",
+    "description": "A very beardy happy birthday!"
+  }
+}

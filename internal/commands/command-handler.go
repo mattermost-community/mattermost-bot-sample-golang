@@ -10,7 +10,6 @@ import (
 	"github.com/pyrousnet/mattermost-golang-bot/internal/settings"
 
 	"github.com/mattermost/mattermost-server/v5/model"
-	"golang.org/x/exp/slices"
 )
 
 type (
@@ -26,11 +25,13 @@ type (
 	}
 
 	BotCommand struct {
-		body     string
-		sender   string
-		target   string
-		mm       *mmclient.MMClient
-		settings *settings.Settings
+		body         string
+		sender       string
+		target       string
+		mm           *mmclient.MMClient
+		settings     *settings.Settings
+		replyChannel *model.Channel
+		method       Method
 	}
 
 	Response struct {
@@ -60,77 +61,114 @@ func NewCommands(settings *settings.Settings, mm *mmclient.MMClient) *Commands {
 	return &commands
 }
 
-func (c *Commands) HandleCommandMsgFromWebSocket(event *model.WebSocketEvent) Response {
+func (c *Commands) HandleCommandMsgFromWebSocket(event *model.WebSocketEvent) (Response, error) {
+	sender, ok := event.GetData()["sender_name"]
+	if ok {
+		p, ok := event.GetData()["post"]
+		if ok {
+			post := model.PostFromJson(strings.NewReader(p.(string))).Message
+
+			bc, err := c.NewBotCommandFromPost(post, sender.(string))
+			if err != nil {
+				return c.SendErrorResponse(sender.(string), err.Error())
+			}
+
+			r, err := c.callCommand(bc)
+			if err != nil {
+				log.Printf("Error Executing command: %v", err)
+				return c.SendErrorResponse(sender.(string), err.Error())
+			}
+
+			if r.Channel == "" && bc.replyChannel.Id == "" {
+				r.Channel = event.GetBroadcast().ChannelId
+			} else {
+				r.Channel = bc.replyChannel.Id
+			}
+
+			return r, err
+		}
+		return Response{}, fmt.Errorf("Error: Post not found.")
+	}
+	return Response{}, fmt.Errorf("Error: Sender not found.")
+}
+
+func (c *Commands) SendErrorResponse(target string, message string) (Response, error) {
+	replyChannel, _ := c.Mm.GetChannelByName(c.Mm.DebuggingChannel.Name)
+	method, _ := c.getMethod("Message")
+
 	bc := BotCommand{
-		mm:       c.Mm,
-		settings: c.Settings,
+		mm:           c.Mm,
+		settings:     c.Settings,
+		target:       target,
+		replyChannel: replyChannel,
+		method:       method,
+		body:         message,
 	}
 
-	if s, ok := event.GetData()["sender_name"]; ok {
-		bc.sender = s.(string)
-	}
+	return c.callCommand(bc)
+}
 
-	var post string
-	if p, ok := event.GetData()["post"]; ok {
-		post = model.PostFromJson(strings.NewReader(p.(string))).Message
-	} else {
-		log.Println("Error: Post not found.")
-		return Response{}
-	}
-
+func (c *Commands) NewBotCommandFromPost(post string, sender string) (BotCommand, error) {
 	ps := strings.Split(post, " ")
+
 	methodName := strings.Title(strings.TrimLeft(ps[0], c.Settings.GetCommandTrigger()))
-	var channel string
-	var s string
-	if len(ps) > 1 {
-		s = fmt.Sprintf("%v", ps[1])
-	}
-	if len(ps) > 2 {
-		channel = fmt.Sprintf("%v", ps[2])
-	}
+	ps = append(ps[:0], ps[1:]...)
 
 	method, err := c.getMethod(methodName)
 	if err != nil {
-		return Response{}
+		return BotCommand{}, err
 	}
 
-	if s == "in" {
-		ps = slices.Delete(ps, 0, 3)
-		bc.body = strings.Join(ps[0:], " ")
-	} else {
-		bc.body = strings.Join(ps[1:], " ")
-	}
+	replyChannel := &model.Channel{}
+	var rcn string
+	if len(ps) > 0 {
+		if ps[0] == "in" {
+			if len(ps) > 1 {
+				rcn = ps[1]
+				ps = append(ps[:0], ps[2:]...)
 
-	r, err := c.callCommand(method, bc)
-	if s == "in" && channel != "" {
-		channelObj, _ := bc.mm.GetChannel(channel)
-		if channelObj != nil {
-			r.Channel = channelObj.Id
-		} else {
-			method, err = c.getMethod("Message")
-			bc.target = bc.sender
-			channelObj, _ = bc.mm.GetChannel(bc.target)
-			bc.body = "The channel `" + channel + "` could not be found."
-			r, err = c.callCommand(method, bc)
+				if rcn != "" {
+					c, _ := c.Mm.GetChannel(rcn)
+					if c != nil {
+						replyChannel = c
+					} else {
+						log.Default().Println(err)
+						return BotCommand{}, fmt.Errorf(`The channel "%s" could not be found.`, rcn)
+					}
+
+				}
+			}
 		}
 	}
-	if err != nil {
-		log.Printf("Error Executing command: %v", err)
-	}
 
-	return r
+	body := strings.Join(ps[:], " ")
+
+	return BotCommand{
+		mm:           c.Mm,
+		settings:     c.Settings,
+		body:         body,
+		method:       method,
+		replyChannel: replyChannel,
+	}, nil
 }
 
-func (c *Commands) callCommand(command Method, param BotCommand) (response Response, err error) {
-	f := command.valueOf
+func (c *Commands) callCommand(botCommand BotCommand) (response Response, err error) {
+	f := botCommand.method.valueOf
 
 	in := make([]reflect.Value, 1)
-	in[0] = reflect.ValueOf(param)
+	in[0] = reflect.ValueOf(botCommand)
 
 	var res []reflect.Value
 	res = f.Call(in)
 	rIface := res[0].Interface()
-	return rIface.(Response), nil
+	if len(res) > 1 {
+		e := res[1].Interface()
+		if e != nil {
+			err = e.(error)
+		}
+	}
+
+	return rIface.(Response), err
 }
 
 func (c *Commands) getMethod(methodName string) (Method, error) {
