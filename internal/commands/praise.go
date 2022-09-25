@@ -13,8 +13,10 @@ func (bc BotCommand) Praise(event BotCommand) (response Response, err error) {
 	var index int
 
 	if event.body == "" { //TODO: Check the user.
-		response.Type = "post"
-		response.Message = "You must tell me who to insult"
+		response.Type = "dm"
+		response.Message = "You must tell me who to praise"
+
+		return response, nil
 	}
 	arraySize := len(praises)
 
