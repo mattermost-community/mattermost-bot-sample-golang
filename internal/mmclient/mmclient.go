@@ -202,9 +202,11 @@ func (c *MMClient) GetChannel(name string) (*model.Channel, *model.Response) {
 // This function returns a proper error so you can know what the heck is going on
 func (c *MMClient) GetChannelByName(name string) (*model.Channel, error) {
 	ch, resp := c.Client.GetChannelByName(name, c.BotTeam.Id, "")
-	e := resp.Error.DetailedError
-	if e != "" {
-		return nil, fmt.Errorf(e)
+	if resp.Error != nil {
+		e := resp.Error.DetailedError
+		if e != "" {
+			return nil, fmt.Errorf(e)
+		}
 	}
 
 	return ch, nil

@@ -56,35 +56,35 @@ func (h *Handler) HandleMsgFromChannel(event *model.WebSocketEvent) {
 	ok, err := regexp.MatchString(pattern, post.Message)
 	if ok {
 		response, err := cmds.HandleCommandMsgFromWebSocket(event)
-		if "" == response.Channel {
-			response.Channel = channelId
-		}
+		if err == nil {
+			if "" == response.Channel {
+				response.Channel = channelId
+			}
 
-		dmchannel, _ := h.mm.Client.CreateDirectChannel(post.UserId, h.mm.BotUser.Id)
-		if response.Channel == dmchannel.Id {
-			response.Type = "dm"
-		}
+			dmchannel, _ := h.mm.Client.CreateDirectChannel(post.UserId, h.mm.BotUser.Id)
+			if response.Channel == dmchannel.Id {
+				response.Type = "dm"
+			}
 
-		if response.Message != "" {
-			switch response.Type {
-			case "post":
-				err = h.mm.SendMsgToChannel(response.Message, response.Channel, post)
-			case "command":
-				err = h.mm.SendCmdToChannel(response.Message, response.Channel, post)
-			case "dm":
-				c, _ := h.mm.Client.CreateDirectChannel(post.UserId, h.mm.BotUser.Id)
-				post := &model.Post{}
-				post.ChannelId = c.Id
-				post.Message = response.Message
+			if response.Message != "" {
+				switch response.Type {
+				case "post":
+					err = h.mm.SendMsgToChannel(response.Message, response.Channel, post)
+				case "command":
+					err = h.mm.SendCmdToChannel(response.Message, response.Channel, post)
+				case "dm":
+					c, _ := h.mm.Client.CreateDirectChannel(post.UserId, h.mm.BotUser.Id)
+					post := &model.Post{}
+					post.ChannelId = c.Id
+					post.Message = response.Message
 
-				_, e := h.mm.Client.CreatePost(post)
-				if e.Error != nil {
-					err = fmt.Errorf("%+v\n", e.Error)
+					_, e := h.mm.Client.CreatePost(post)
+					if e.Error != nil {
+						err = fmt.Errorf("%+v\n", e.Error)
+					}
 				}
 			}
-		}
-
-		if err != nil {
+		} else {
 			log.Println(err)
 		}
 	}

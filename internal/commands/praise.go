@@ -7,6 +7,14 @@ import (
 	"time"
 )
 
+func (h BotCommandHelp) Praise(request BotCommand) (response HelpResponse) {
+	response.Help = "Give a Bender specific praise from a random list."
+
+	response.Description = "Cause the bot to praise someone. Usage: '!praise {target}'"
+
+	return response
+}
+
 func (bc BotCommand) Praise(event BotCommand) (response Response, err error) {
 	praises := event.settings.GetPraises()
 	response.Type = "post"

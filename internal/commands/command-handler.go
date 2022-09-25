@@ -102,6 +102,7 @@ func (c *Commands) SendErrorResponse(target string, message string) (Response, e
 		target:       target,
 		replyChannel: replyChannel,
 		method:       method,
+		body:         message,
 	}
 
 	return c.callCommand(bc)
