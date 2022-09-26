@@ -31,9 +31,9 @@ func main() {
 		log.Fatalln(err.Error())
 	}
 
-	redis := cache.GetCachingMechanism(cfg.Cache.CONN_STR)
+	botCache := cache.GetCachingMechanism(cfg.Cache.CONN_STR)
 
-	handler, err := handler.NewHandler(mmClient, redis)
+	handler, err := handler.NewHandler(mmClient, botCache)
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
