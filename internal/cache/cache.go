@@ -1,39 +1,85 @@
 package cache
 
 import (
-	"sync"
+	"context"
+	"fmt"
+	"net/url"
+
+	"github.com/go-redis/redis/v8"
 )
 
-type Cache struct {
-	mu   sync.RWMutex
-	data map[string]interface{}
+type Cache interface {
+	Put(key string, value interface{})
+	PutAll(map[string]interface{})
+	Get(key string) interface{}
+	GetAll(keys []string) map[string]interface{}
+	Clean(key string)
+	CleanAll()
 }
 
-func NewCache() *Cache {
-	return &Cache{}
+type RedisCache struct {
+	conn *redis.Client
+	ctx  context.Context
 }
 
-func (c *Cache) Set(key string, data interface{}) {
-	c.mu.Lock()
-	c.data[key] = data
-	c.mu.Unlock()
+var cfg struct {
+	ConnectionString string
 }
 
-func (c *Cache) Get(key string) (data interface{}, ok bool) {
-	c.mu.RLock()
-	data, ok = c.data[key]
-	c.mu.RUnlock()
-	return
+func GetCachingMechanism(connStr string) Cache {
+	uri, _ := url.Parse(connStr)
+	password, _ := uri.User.Password()
+
+	cch := &RedisCache{
+		conn: redis.NewClient(&redis.Options{
+			Addr:     fmt.Sprintf("%s:%s", uri.Hostname(), uri.Port()),
+			Username: uri.User.Username(),
+			Password: password,
+		}),
+	}
+
+	cch.ctx = context.Background()
+
+	return cch
 }
 
-func (c *Cache) Remove(key string) {
-	c.mu.Lock()
-	delete(c.data, key)
-	c.mu.Unlock()
+func (rc *RedisCache) Put(key string, value interface{}) {
+	if err := rc.conn.Set(rc.ctx, key, value, 0); err != nil {
+		fmt.Println(err)
+	}
 }
 
-func (c *Cache) ClearCache() {
-	c.mu.Lock()
-	c.data = make(map[string]interface{})
-	c.mu.Unlock()
+func (rc *RedisCache) PutAll(entries map[string]interface{}) {
+	for k, v := range entries {
+		rc.Put(k, v)
+	}
+}
+
+func (rc *RedisCache) Get(key string) interface{} {
+	value, err := rc.conn.Get(rc.ctx, key).Result()
+	if err != nil {
+		fmt.Println(err)
+		return ""
+	}
+	return value
+}
+
+func (rc *RedisCache) GetAll(keys []string) map[string]interface{} {
+	entries := make(map[string]interface{})
+	for _, k := range keys {
+		entries[k] = rc.Get(k)
+	}
+
+	return entries
+}
+
+func (rc *RedisCache) Clean(key string) {
+	if err := rc.conn.Del(rc.ctx, key); err != nil {
+		fmt.Println(err)
+	}
+}
+
+// CleanAll cleans the entire cache.
+func (rc *RedisCache) CleanAll() {
+	rc.conn.FlushDB(rc.ctx)
 }

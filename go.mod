@@ -3,13 +3,15 @@ module github.com/pyrousnet/mattermost-golang-bot
 go 1.19
 
 require (
+	github.com/go-redis/redis/v8 v8.11.5
 	github.com/mattermost/mattermost-server/v5 v5.39.3
 	github.com/tkanos/gonfig v0.0.0-20210106201359-53e13348de2f
-	golang.org/x/exp v0.0.0-20220916125017-b168a2c6b86b
 )
 
 require (
 	github.com/blang/semver v3.5.1+incompatible // indirect
+	github.com/cespare/xxhash/v2 v2.1.2 // indirect
+	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/dustin/go-humanize v1.0.0 // indirect
 	github.com/dyatlov/go-opengraph v0.0.0-20210112100619-dae8665a5b09 // indirect
 	github.com/francoispqt/gojay v1.2.13 // indirect

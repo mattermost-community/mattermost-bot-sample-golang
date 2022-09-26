@@ -7,6 +7,7 @@ import (
 	"os/signal"
 
 	"github.com/mattermost/mattermost-server/v5/model"
+	"github.com/pyrousnet/mattermost-golang-bot/internal/settings"
 )
 
 type MMClient struct {
@@ -17,7 +18,7 @@ type MMClient struct {
 	DebuggingChannel *model.Channel
 	Server           Server
 	SettingsUrl      string
-	cfg              *Config
+	cfg              *settings.Config
 }
 
 type Server struct {
@@ -28,14 +29,10 @@ type Server struct {
 
 // Documentation for the Go driver can be found
 // at https://godoc.org/github.com/mattermost/platform/model#Client
-func NewMMClient(env string) (client *MMClient, err error) {
+func NewMMClient(cfg *settings.Config) (client *MMClient, err error) {
 	client = &MMClient{}
 
-	client.cfg, err = GetConfig(env)
-	if err != nil {
-		return client, err
-	}
-
+	client.cfg = cfg
 	client.Server = client.cfg.Server
 	client.SettingsUrl = client.cfg.Bot.SETTINGS_URL
 	conn := client.Server.PROTOCOL + client.Server.HOST
