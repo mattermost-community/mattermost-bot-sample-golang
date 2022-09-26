@@ -28,10 +28,10 @@ type Server struct {
 
 // Documentation for the Go driver can be found
 // at https://godoc.org/github.com/mattermost/platform/model#Client
-func NewMMClient() (client *MMClient, err error) {
+func NewMMClient(env string) (client *MMClient, err error) {
 	client = &MMClient{}
 
-	client.cfg, err = GetConfig()
+	client.cfg, err = GetConfig(env)
 	if err != nil {
 		return client, err
 	}

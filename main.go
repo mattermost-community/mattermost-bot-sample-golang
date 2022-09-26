@@ -6,13 +6,20 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/pyrousnet/mattermost-golang-bot/internal/handler"
 	"github.com/pyrousnet/mattermost-golang-bot/internal/mmclient"
 )
 
 func main() {
-	mm, err := mmclient.NewMMClient()
+	//TODO: Set default env to prod
+	env := os.Getenv("ENV")
+	if env == "" {
+		env = "dev"
+	}
+
+	mm, err := mmclient.NewMMClient(env)
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
