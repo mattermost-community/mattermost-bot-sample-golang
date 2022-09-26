@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/pyrousnet/mattermost-golang-bot/internal/cache"
 	"github.com/pyrousnet/mattermost-golang-bot/internal/commands"
 	"github.com/pyrousnet/mattermost-golang-bot/internal/mmclient"
 	"github.com/pyrousnet/mattermost-golang-bot/internal/settings"
@@ -14,16 +15,18 @@ import (
 )
 
 type Handler struct {
+	Cache    cache.Cache
 	Settings *settings.Settings
 	mm       *mmclient.MMClient
 }
 
-func NewHandler(mm *mmclient.MMClient) (*Handler, error) {
+func NewHandler(mm *mmclient.MMClient, redis cache.Cache) (*Handler, error) {
 	settings, err := settings.NewSettings(mm.SettingsUrl)
 
 	return &Handler{
 		Settings: settings,
 		mm:       mm,
+		Cache:    redis,
 	}, err
 }
 

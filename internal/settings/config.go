@@ -1,8 +1,7 @@
-package mmclient
+package settings
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/tkanos/gonfig"
 )
@@ -24,16 +23,14 @@ type Config struct {
 		LOG_NAME      string `yaml:"log_name"`
 		SETTINGS_URL  string `yaml:"settings_url"`
 	} `yaml:"bot"`
+	Cache struct {
+		CONN_STR string `yaml:"connection_string"`
+	} `yaml:"cache"`
 }
 
-func GetConfig(params ...string) (*Config, error) {
+// GetConfig reads the bot configuration file and loads into a Config struct
+func GetConfig(env string) (*Config, error) {
 	cfg := Config{}
-
-	//TODO: Set default env to prod
-	env := os.Getenv("ENV")
-	if env == "" {
-		env = "dev"
-	}
 
 	// This here is only going to work so long as the bot is started in the main working directory.
 	// We might want to set this to pull from some config directory in $GOROOT

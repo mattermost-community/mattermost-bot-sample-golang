@@ -1,39 +1,25 @@
 package cache
 
 import (
-	"sync"
+	"net/url"
 )
 
-type Cache struct {
-	mu   sync.RWMutex
-	data map[string]interface{}
+type Cache interface {
+	Put(key string, value interface{})
+	PutAll(map[string]interface{})
+	Get(key string) interface{}
+	GetAll(keys []string) map[string]interface{}
+	Clean(key string)
+	CleanAll()
 }
 
-func NewCache() *Cache {
-	return &Cache{}
-}
+func GetCachingMechanism(connStr string) Cache {
+	uri, _ := url.Parse(connStr)
 
-func (c *Cache) Set(key string, data interface{}) {
-	c.mu.Lock()
-	c.data[key] = data
-	c.mu.Unlock()
-}
-
-func (c *Cache) Get(key string) (data interface{}, ok bool) {
-	c.mu.RLock()
-	data, ok = c.data[key]
-	c.mu.RUnlock()
-	return
-}
-
-func (c *Cache) Remove(key string) {
-	c.mu.Lock()
-	delete(c.data, key)
-	c.mu.Unlock()
-}
-
-func (c *Cache) ClearCache() {
-	c.mu.Lock()
-	c.data = make(map[string]interface{})
-	c.mu.Unlock()
+	switch uri.Scheme {
+	case "redis":
+		return GetRedisCache(connStr)
+	default:
+		return GetLocalCache()
+	}
 }

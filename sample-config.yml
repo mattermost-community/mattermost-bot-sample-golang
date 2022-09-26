@@ -14,3 +14,6 @@ bot:
   team_name: "teamname"
   log_channel: "test-channel"
   settings_url: "https://yourdomain.com/config"
+# Cache configurations
+cache:
+  connection_string: "redis://:password@host:port"

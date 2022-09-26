@@ -1,9 +1,25 @@
 version: "3.9"
+
+volumes:
+  redis:
+
 services:
   test_mm:
     image: mattermost/mattermost-preview
     container_name: test_mm
-    ports: 
+    ports:
     - "8065:8065"
     environment:
       MM_SERVICESETTINGS_ENABLELOCALMODE: "true"
+
+  redis:
+    container_name: redis
+    image: "redis:6.0.9-alpine"
+    command: redis-server --requirepass password
+    restart: always
+    ports:
+      - 6379:6379
+    volumes:
+      - redis:/data
+
+
