@@ -2,7 +2,7 @@
 
 ## Overview
 
-This sample Bot shows how to use the Mattermost [Go driver](https://github.com/mattermost/mattermost-server/blob/master/model/client4.go) to interact with a Mattermost server, listen to events and respond to messages. Documentation for the Go driver can be found [here](https://godoc.org/github.com/mattermost/mattermost-server/model#Client).
+This sample Bot shows how to use the Mattermost [Go driver](https://github.com/mattermost/mattermost-server/blob/master/model/client4.go) to interact with a Mattermost server, listen to events and respond to messages. Documentation for the Go driver can be found [here](https://pkg.go.dev/github.com/mattermost/mattermost-server/v6/model).
 
 Highlights of APIs used in this sample:
  - Log in to the Mattermost server
@@ -11,7 +11,7 @@ Highlights of APIs used in this sample:
  - Connect and listen to WebSocket events for real-time responses to messages
  - Post a message to a channel
 
-This Bot Sample was tested with Mattermost server version 3.10.0.
+This Bot Sample was tested with Mattermost server version 7.5.2.
 
 ## Setup Server Environment
 
@@ -22,7 +22,10 @@ This Bot Sample was tested with Mattermost server version 3.10.0.
 
 3 - Run `docker-compose up -d --build` and the mattermost client will be built and will expose the port `8065` to your system's localhost
 
-4 - Start the Bot.
+4 - Get a bot token by logging into your mattermost instance, copy `example.env` to `.env` and fill in the credentials. Alternatively, just provide your credentials as environment variables.
+
+5 - Start the Bot.
+
 ```
 make run
 ```
@@ -73,21 +76,23 @@ Learn more about the `mmctl` CLI tool in the [Mattermost documentation](https://
 git clone https://github.com/mattermost/mattermost-bot-sample-golang.git
 cd mattermost-bot-sample-golang
 ```
-3 - Start the Bot.
+3 - Get a bot token by logging into your mattermost instance, copy `example.env` to `.env` and fill in the credentials.
+
+4 - Start the Bot.
 ```
 make run
 ```
 You can verify the Bot is running when 
-  - `Server detected and is running version X.Y.Z` appears on the command line.
-  - `Mattermost Bot Sample has started running` is posted in the `Debugging For Sample Bot` channel.
+  - `Logged in to mattermost` appears on the command line.
+  - `Hi! I am a bot.` is posted in the your specified channel.
 
 ## Test the Bot
 
 1 - Log in to the Mattermost server as `bill@example.com` and `Password1!`.
 
-2 - Join the `Debugging For Sample Bot` channel.
+2 - Join the your specified channel.
 
-3 - Post a message in the channel such as `are you running?` to see if the Bot responds. You should see a response similar to `Yes I'm running` if the Bot is running.
+3 - Post a message in the channel such as `hello?` to see if the Bot responds. You should see a response if the Bot is running.
 
 ## Stop the Bot
 
